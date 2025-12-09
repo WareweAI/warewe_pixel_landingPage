@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "build/client",
+  "serverlessFunctionRegion": "bom1",
+  "framework": null,
+  "installCommand": "npm install",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
