@@ -9,13 +9,23 @@ declare global {
 let prisma: PrismaClient;
 
 if (process.env.DATABASE_URL) {
-  if (process.env.NODE_ENV !== "production") {
-    if (!global.prismaGlobal) {
-      global.prismaGlobal = new PrismaClient();
+  try {
+    if (process.env.NODE_ENV !== "production") {
+      if (!global.prismaGlobal) {
+        global.prismaGlobal = new PrismaClient({
+          log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+        });
+      }
+      prisma = global.prismaGlobal;
+    } else {
+      prisma = new PrismaClient({
+        log: ["error"],
+      });
     }
-    prisma = global.prismaGlobal;
-  } else {
-    prisma = new PrismaClient();
+  } catch (error) {
+    console.error("Failed to initialize Prisma client:", error);
+    // Create a mock Prisma client to prevent crashes
+    prisma = {} as PrismaClient;
   }
 } else {
   // Create a mock Prisma client for environments without database

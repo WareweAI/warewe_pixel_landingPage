@@ -1,5 +1,6 @@
 import { redirect, type LoaderFunctionArgs } from "react-router";
-import { Form } from "react-router";
+import { Form, useLoaderData } from "react-router";
+import { login } from "../../shopify.server";
 import styles from "./style.module.css";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -9,12 +10,22 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
-  return { showForm: true };
+  // Always show the form on landing page for public access
+  // Check if Shopify keys are configured (they should be from .env)
+  const hasShopifyKeys = Boolean(process.env.SHOPIFY_API_KEY && process.env.SHOPIFY_API_SECRET);
+  const showForm = true; // Always show form on landing page
+  const appStoreUrl = process.env.SHOPIFY_APP_STORE_URL;
+
+  // Log for debugging (remove in production if needed)
+  if (!hasShopifyKeys) {
+    console.warn("⚠️ SHOPIFY_API_KEY or SHOPIFY_API_SECRET not found in environment variables");
+  }
+
+  return { showForm, appStoreUrl, hasShopifyKeys };
 };
 
 export default function App() {
-  const showForm = true;
-  
+  const { showForm, appStoreUrl } = useLoaderData<typeof loader>();
 
   return (
     <div className={styles.container}>
@@ -29,10 +40,10 @@ export default function App() {
             </div>
           </div>
           {showForm && (
-            <Form method="post" action="/auth/login">
+            <Form method="post" action="/auth/login" className={styles.loginForm}>
               <button className={styles.navButton} type="submit">
                 <img src="/assets/shopify.png" alt="Shopify" className={styles.shopifyIcon} />
-                Install App
+                Get started
               </button>
             </Form>
           )}
@@ -59,7 +70,7 @@ export default function App() {
             </p>
           </div>
 
-          {showForm ? (
+          {showForm && (
             <Form method="post" action="/auth/login" className={styles.ctaForm}>
               <div className={styles.inputGroup}>
                 <input 
@@ -74,12 +85,8 @@ export default function App() {
                   Install App
                 </button>
               </div>
-              <p className={styles.inputHint}>Enter your Shopify store domain to get started in seconds.</p>
+              <p className={styles.inputHint}>Enter your Shopify store domain to get started</p>
             </Form>
-          ) : (
-            <div className={styles.ctaForm}>
-              <p className={styles.inputHint}>Enter your Shopify store domain to get started in seconds.</p>
-            </div>
           )}
 
           <div className={styles.featureCards}>
