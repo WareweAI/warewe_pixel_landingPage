@@ -14,8 +14,13 @@ export default async function handleRequest(
   responseHeaders: Headers,
   reactRouterContext: EntryContext
 ) {
-  // Add Shopify headers
-  addDocumentResponseHeaders(request, responseHeaders);
+  // Add Shopify headers if available
+  try {
+    addDocumentResponseHeaders(request, responseHeaders);
+  } catch (error) {
+    // Shopify not configured - this is fine for landing page on Vercel
+    console.log("Shopify headers not added - running in standalone mode");
+  }
   const userAgent = request.headers.get("user-agent");
   const callbackName = isbot(userAgent ?? '')
     ? "onAllReady"
