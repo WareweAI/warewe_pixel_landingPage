@@ -4,6 +4,12 @@ import { ServerRouter } from "react-router";
 import { createReadableStreamFromReadable } from "@react-router/node";
 import { type EntryContext } from "react-router";
 import { isbot } from "isbot";
+import { loadEnv } from "./lib/env-loader.server";
+
+// Load environment variables FIRST, before importing shopify.server
+loadEnv();
+
+// Now import shopify.server (which depends on env vars being loaded)
 import { addDocumentResponseHeaders } from "./shopify.server";
 
 export const streamTimeout = 5000;

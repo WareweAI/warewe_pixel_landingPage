@@ -5,8 +5,11 @@ import { Form, useActionData, useLoaderData, useRouteError, isRouteErrorResponse
 
 import { login } from "../../shopify.server";
 import { loginErrorMessage } from "./error.server";
+import { loadEnv } from "../../lib/env-loader.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  // Load environment variables (server-only)
+  loadEnv();
   if (!login) {
     throw new Response("Shopify configuration not found. Please set SHOPIFY_API_KEY and SHOPIFY_API_SECRET environment variables.", {
       status: 500,
@@ -38,14 +41,35 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  if (!login) {
+  // Load environment variables (server-only) - ensure fresh load
+  loadEnv();
+  
+  // Re-check login after loading env (in case it wasn't initialized before)
+  // Re-import to get fresh reference after env load
+  const { login: freshLogin } = await import("../../shopify.server");
+  
+  if (!freshLogin && !login) {
+    console.error('❌ Shopify login not available after env load');
+    console.error('SHOPIFY_API_KEY:', process.env.SHOPIFY_API_KEY ? 'Present' : 'Missing');
+    console.error('SHOPIFY_API_SECRET:', process.env.SHOPIFY_API_SECRET ? 'Present' : 'Missing');
+    throw new Response("Shopify configuration not found. Please set SHOPIFY_API_KEY and SHOPIFY_API_SECRET environment variables.", {
+      status: 500,
+    });
+  }
+  
+  const activeLogin = freshLogin || login;
+
+  if (!activeLogin) {
+    console.error('❌ Shopify login not available after env load');
+    console.error('SHOPIFY_API_KEY:', process.env.SHOPIFY_API_KEY ? 'Present' : 'Missing');
+    console.error('SHOPIFY_API_SECRET:', process.env.SHOPIFY_API_SECRET ? 'Present' : 'Missing');
     throw new Response("Shopify configuration not found. Please set SHOPIFY_API_KEY and SHOPIFY_API_SECRET environment variables.", {
       status: 500,
     });
   }
 
   try {
-    const loginResult = await login(request);
+    const loginResult = await activeLogin(request);
     
     // If login returns a Response (redirect), throw it
     if (loginResult instanceof Response) {

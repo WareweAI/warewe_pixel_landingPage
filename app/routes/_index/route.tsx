@@ -1,29 +1,40 @@
 import { redirect, type LoaderFunctionArgs } from "react-router";
 import { Form, useLoaderData } from "react-router";
-import { login } from "../../shopify.server";
 import styles from "./style.module.css";
+import { loadEnv } from "../../lib/env-loader.server";
 
+// Loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  // Load environment variables (server-only)
+  loadEnv();
   const url = new URL(request.url);
 
+  // If shop param exists → redirect to app
   if (url.searchParams.get("shop")) {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
-  // Always show the form on landing page for public access
-  // Check if Shopify keys are configured (they should be from .env)
-  const hasShopifyKeys = Boolean(process.env.SHOPIFY_API_KEY && process.env.SHOPIFY_API_SECRET);
-  const showForm = true; // Always show form on landing page
+  // Check for Shopify env keys
+  const hasShopifyKeys = Boolean(
+    process.env.SHOPIFY_API_KEY && process.env.SHOPIFY_API_SECRET
+  );
+
   const appStoreUrl = process.env.SHOPIFY_APP_STORE_URL;
 
-  // Log for debugging (remove in production if needed)
   if (!hasShopifyKeys) {
-    console.warn("⚠️ SHOPIFY_API_KEY or SHOPIFY_API_SECRET not found in environment variables");
+    console.warn(
+      "⚠️ SHOPIFY_API_KEY or SHOPIFY_API_SECRET missing in environment variables"
+    );
   }
 
-  return { showForm, appStoreUrl, hasShopifyKeys };
+  return {
+    showForm: true,
+    appStoreUrl,
+    hasShopifyKeys,
+  };
 };
 
+// Component
 export default function App() {
   const { showForm, appStoreUrl } = useLoaderData<typeof loader>();
 
@@ -36,13 +47,20 @@ export default function App() {
             <div className={styles.logoIcon}>P</div>
             <div className={styles.logoTextContainer}>
               <span className={styles.logoTitle}>Pixel</span>
-              <span className={styles.logoSubtitle}>Track your store's performance</span>
+              <span className={styles.logoSubtitle}>
+                Track your store's performance
+              </span>
             </div>
           </div>
+
           {showForm && (
             <Form method="post" action="/auth/login" className={styles.loginForm}>
               <button className={styles.navButton} type="submit">
-                <img src="/assets/shopify.png" alt="Shopify" className={styles.shopifyIcon} />
+                <img
+                  src="/assets/shopify.png"
+                  alt="Shopify"
+                  className={styles.shopifyIcon}
+                />
                 Get started
               </button>
             </Form>
@@ -54,7 +72,11 @@ export default function App() {
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <div className={styles.heroBadge}>
-            <img src="/assets/shopify.png" alt="Shopify" className={styles.badgeIcon} />
+            <img
+              src="/assets/shopify.png"
+              alt="Shopify"
+              className={styles.badgeIcon}
+            />
             <span>Pixel Event Tracker for Shopify</span>
           </div>
 
@@ -66,41 +88,58 @@ export default function App() {
               </span>
             </h1>
             <p className={styles.heroSubtitle}>
-              Drop in Pixel, capture page views, clicks, carts, purchases, and errors with full context—URLs, sources, and devices—in one dashboard.
+              Drop in Pixel, capture page views, clicks, carts, purchases, and
+              errors with full context—URLs, sources, and devices—in one
+              dashboard.
             </p>
           </div>
 
           {showForm && (
             <Form method="post" action="/auth/login" className={styles.ctaForm}>
               <div className={styles.inputGroup}>
-                <input 
-                  className={styles.input} 
-                  type="text" 
-                  name="shop" 
+                <input
+                  className={styles.input}
+                  type="text"
+                  name="shop"
                   placeholder="your-store.myshopify.com"
                   required
                 />
                 <button className={styles.ctaButton} type="submit">
-                  <img src="/assets/shopify.png" alt="Shopify" className={styles.shopifyIcon} />
+                  <img
+                    src="/assets/shopify.png"
+                    alt="Shopify"
+                    className={styles.shopifyIcon}
+                  />
                   Install App
                 </button>
               </div>
-              <p className={styles.inputHint}>Enter your Shopify store domain to get started</p>
+              <p className={styles.inputHint}>
+                Enter your Shopify store domain to get started
+              </p>
             </Form>
           )}
 
           <div className={styles.featureCards}>
             <div className={styles.featureCard}>
               <p className={styles.featureCardTitle}>Reliability</p>
-              <p className={styles.featureCardText}>Live health checks and event-delivery monitoring keep data flowing without gaps.</p>
+              <p className={styles.featureCardText}>
+                Live health checks and event-delivery monitoring keep data
+                flowing without gaps.
+              </p>
             </div>
             <div className={styles.featureCard}>
               <p className={styles.featureCardTitle}>Security</p>
-              <p className={styles.featureCardText}>Shopify-grade protections, scoped keys, and data minimization for safer tracking.</p>
+              <p className={styles.featureCardText}>
+                Shopify-grade protections, scoped keys, and data minimization
+                for safer tracking.
+              </p>
             </div>
             <div className={styles.featureCard}>
               <p className={styles.featureCardTitle}>Support</p>
-              <p className={styles.featureCardText}>Tracking specialists ready to help debug events, attribution, and theme rollouts.</p>
+              <p className={styles.featureCardText}>
+                Tracking specialists ready to help debug events, attribution,
+                and theme rollouts.
+              </p>
             </div>
           </div>
         </div>
@@ -111,40 +150,62 @@ export default function App() {
         <div className={styles.aboutContent}>
           <div className={styles.aboutHeader}>
             <span className={styles.aboutBadge}>
-              <img src="/assets/shopify.png" alt="" className={styles.badgeIconSmall} />
+              <img
+                src="/assets/shopify.png"
+                alt=""
+                className={styles.badgeIconSmall}
+              />
               About Pixel
             </span>
             <h2 className={styles.aboutTitle}>
-              Track every event with the clarity of Meta Pixel—purpose-built for Shopify
+              Track every event with the clarity of Meta Pixel—purpose-built for
+              Shopify
             </h2>
             <p className={styles.aboutSubtitle}>
-              Pixel shows what fired, where it fired, and why. Instrument once, see full-funnel analytics, and keep your theme clean without heavy engineering time.
+              Pixel shows what fired, where it fired, and why. Instrument once,
+              see full-funnel analytics, and keep your theme clean without heavy
+              engineering time.
             </p>
           </div>
 
           <div className={styles.featuresGrid}>
             <div className={styles.feature}>
               <p className={styles.featureTitle}>Event stream with context</p>
-              <p className={styles.featureText}>Capture page views, clicks, carts, purchases, and errors with URLs, sources, and devices.</p>
+              <p className={styles.featureText}>
+                Capture page views, clicks, carts, purchases, and errors with
+                URLs, sources, and devices.
+              </p>
             </div>
             <div className={styles.feature}>
               <p className={styles.featureTitle}>Where events fired</p>
-              <p className={styles.featureText}>See exactly which page, theme block, or campaign triggered each event for faster fixes.</p>
+              <p className={styles.featureText}>
+                See exactly which page, theme block, or campaign triggered each
+                event for faster fixes.
+              </p>
             </div>
             <div className={styles.feature}>
               <p className={styles.featureTitle}>Themes & branding ready</p>
-              <p className={styles.featureText}>Drop Pixel into any theme and keep your brand styling consistent with minimal changes.</p>
+              <p className={styles.featureText}>
+                Drop Pixel into any theme and keep your brand styling consistent
+                with minimal changes.
+              </p>
             </div>
             <div className={styles.feature}>
               <p className={styles.featureTitle}>Governed and safe</p>
-              <p className={styles.featureText}>Role-aware controls, audit trails, and rollback-safe configs so teams can ship confidently.</p>
+              <p className={styles.featureText}>
+                Role-aware controls, audit trails, and rollback-safe configs so
+                teams can ship confidently.
+              </p>
             </div>
           </div>
 
           <div className={styles.supportBanner}>
             <div className={styles.supportText}>
               <p className={styles.supportTitle}>Always-on support</p>
-              <p className={styles.supportSubtitle}>Event-tracking specialists ready to help debug triggers, attribution, and rollouts.</p>
+              <p className={styles.supportSubtitle}>
+                Event-tracking specialists ready to help debug triggers,
+                attribution, and rollouts.
+              </p>
             </div>
             <button className={styles.supportButton}>Talk with us</button>
           </div>
@@ -154,9 +215,11 @@ export default function App() {
       {/* Footer */}
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
-          <span className={styles.footerText}>©2025 Warewe Consultancy Private Limited</span>
-          <a 
-            href="/privacy-policy" 
+          <span className={styles.footerText}>
+            ©2025 Warewe Consultancy Private Limited
+          </span>
+          <a
+            href="/privacy-policy"
             className={styles.footerLink}
             target="_blank"
             rel="noopener noreferrer"
