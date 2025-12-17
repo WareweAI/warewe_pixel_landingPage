@@ -104,7 +104,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   var APP_ID = '${id}';
   var SHOP = '${shopDomain || ""}';
   var ENDPOINT = '/apps/pixel-api/track';
-  var DEBUG = false;
+  var DEBUG = true;
   var CUSTOM_EVENTS = ${JSON.stringify(customEvents.map(e => ({ name: e.name, selector: e.selector, eventType: e.eventType })))};
 
   function generateId() {
@@ -162,17 +162,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     if (DEBUG) console.log('[PixelTracker]', eventName, data);
 
-    // Use sendBeacon for reliability
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(ENDPOINT + '?shop=' + SHOP, JSON.stringify(data));
-    } else {
-      fetch(ENDPOINT + '?shop=' + SHOP, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        keepalive: true
-      }).catch(function() {});
-    }
+    // Use fetch for App Proxy compatibility
+    fetch(ENDPOINT + '?shop=' + SHOP, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      keepalive: true
+    })
+    .then(function(r) { if (DEBUG) console.log('[PixelTracker] Track response:', r.status); })
+    .catch(function(e) { if (DEBUG) console.error('[PixelTracker] Track error:', e); });
   }
 
   window.PixelAnalytics = {
