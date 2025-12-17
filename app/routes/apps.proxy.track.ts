@@ -3,6 +3,7 @@ import type { ActionFunctionArgs } from "react-router";
 import prisma from "~/db.server";
 import { parseUserAgent, getDeviceType } from "~/services/device.server";
 import { getGeoData } from "~/services/geo.server";
+import { forwardToMeta } from "~/services/meta-capi.server";
 
 export async function action({ request }: ActionFunctionArgs) {
   const url = new URL(request.url);
@@ -119,6 +120,33 @@ export async function action({ request }: ActionFunctionArgs) {
         sessions: 1,
       },
     });
+
+    // Forward to Meta Conversions API if enabled
+    if (app.settings?.metaPixelEnabled && app.settings?.metaVerified && app.settings?.metaAccessToken) {
+      try {
+        console.log(`[App Proxy track] Forwarding to Meta: ${eventName}`);
+        await forwardToMeta({
+          pixelId: app.settings.metaPixelId!,
+          accessToken: app.settings.metaAccessToken,
+          testEventCode: app.settings.metaTestEventCode || undefined,
+          event: {
+            eventName,
+            eventTime: Math.floor(Date.now() / 1000),
+            eventSourceUrl: body.url,
+            actionSource: 'website',
+            userData: {
+              clientIpAddress: ip,
+              clientUserAgent: userAgent,
+              externalId: body.visitorId || body.fingerprint,
+            },
+            customData: body.customData || body.properties,
+          },
+        });
+        console.log(`[App Proxy track] Meta forwarded successfully`);
+      } catch (metaError) {
+        console.error('[App Proxy track] Meta forwarding error:', metaError);
+      }
+    }
 
     return Response.json({ success: true, eventId: event.id });
   } catch (error) {
