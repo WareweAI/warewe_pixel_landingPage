@@ -9,22 +9,29 @@
   'use strict';
   
   var SHOP = '{{ shop.permanent_domain }}';
-  var DEBUG = true;
+  var DEBUG = {{ block.settings.debug_mode | json }};
+  var TRACK_PAGEVIEWS = {{ block.settings.track_pageviews | json }};
+  var TRACK_CLICKS = {{ block.settings.track_clicks | json }};
+  var TRACK_SCROLL = {{ block.settings.track_scroll | json }};
+  var TRACK_FORMS = {{ block.settings.track_forms | json }};
+  var TRACK_ECOMMERCE = {{ block.settings.track_ecommerce | json }};
   
-  // Use App Proxy URL (same-origin, no CORS)
   var PROXY_URL = '/apps/pixel-api';
   
   if (DEBUG) console.log('[PixelTracker] Starting for shop:', SHOP);
   
-  // Fetch pixel config
+  window.PIXEL_TRACKER_SETTINGS = {
+    trackPageviews: TRACK_PAGEVIEWS,
+    trackClicks: TRACK_CLICKS,
+    trackScroll: TRACK_SCROLL,
+    trackForms: TRACK_FORMS,
+    trackEcommerce: TRACK_ECOMMERCE,
+    debug: DEBUG
+  };
+  
   fetch(PROXY_URL + '/get-pixel-id?shop=' + encodeURIComponent(SHOP))
-    .then(function(res) {
-      if (DEBUG) console.log('[PixelTracker] Config response:', res.status);
-      return res.json();
-    })
+    .then(function(res) { return res.json(); })
     .then(function(data) {
-      if (DEBUG) console.log('[PixelTracker] Config data:', data);
-      
       if (data.error) {
         console.warn('[PixelTracker] Error:', data.error);
         return;
@@ -32,16 +39,37 @@
       
       window.PIXEL_TRACKER_ID = data.pixelId;
       window.PIXEL_TRACKER_CONFIG = data.config || {};
+      window.PIXEL_TRACKER_CUSTOM_EVENTS = data.customEvents || [];
       
-      // Load the tracking script
+      if (DEBUG && data.customEvents) {
+        console.log('[PixelTracker] Custom events:', data.customEvents);
+      }
+      
+      var params = new URLSearchParams();
+      params.set('id', data.pixelId);
+      params.set('shop', SHOP);
+      
       var script = document.createElement('script');
       script.async = true;
-      script.src = PROXY_URL + '/pixel.js?id=' + data.pixelId + '&shop=' + encodeURIComponent(SHOP);
+      script.src = PROXY_URL + '/pixel.js?' + params.toString();
       script.onload = function() {
-        if (DEBUG) console.log('[PixelTracker] Script loaded successfully');
-      };
-      script.onerror = function(e) {
-        console.error('[PixelTracker] Script load error:', e);
+        if (DEBUG) console.log('[PixelTracker] Script loaded');
+        
+        // Auto-setup custom events from app
+        if (data.customEvents && data.customEvents.length > 0) {
+          data.customEvents.forEach(function(evt) {
+            if (evt.selector && evt.eventType) {
+              document.querySelectorAll(evt.selector).forEach(function(el) {
+                el.addEventListener(evt.eventType, function() {
+                  if (window.PixelTracker && window.PixelTracker.track) {
+                    window.PixelTracker.track(evt.name, { selector: evt.selector });
+                    if (DEBUG) console.log('[PixelTracker] Custom event:', evt.name);
+                  }
+                });
+              });
+            }
+          });
+        }
       };
       document.head.appendChild(script);
       
@@ -57,11 +85,10 @@
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', data.metaPixelId);
         fbq('track', 'PageView');
-        if (DEBUG) console.log('[PixelTracker] FB Pixel initialized:', data.metaPixelId);
       }
     })
     .catch(function(err) {
-      console.error('[PixelTracker] Fetch error:', err);
+      console.error('[PixelTracker] Error:', err);
     });
 })();
 </script>
@@ -73,9 +100,53 @@
   "target": "body",
   "settings": [
     {
+      "type": "header",
+      "content": "Tracking Settings"
+    },
+    {
       "type": "checkbox",
       "id": "enable_tracking",
       "label": "Enable Tracking",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "debug_mode",
+      "label": "Debug Mode",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Events"
+    },
+    {
+      "type": "checkbox",
+      "id": "track_pageviews",
+      "label": "Page Views",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "track_clicks",
+      "label": "Clicks",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "track_scroll",
+      "label": "Scroll Depth",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "track_forms",
+      "label": "Form Submissions",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "track_ecommerce",
+      "label": "E-commerce Events",
       "default": true
     }
   ]
