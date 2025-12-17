@@ -1,37 +1,47 @@
 {% comment %}
   Pixel Tracker - Theme App Extension
-  Uses Shopify App Proxy to avoid CORS issues
-  Requests go to: /apps/pixel-api/* (same origin as shop)
+  Injects tracking script into storefront head
 {% endcomment %}
 
-{% if block.settings.enabled %}
-<!-- Pixel Tracker by Warewe -->
 <script>
 (function() {
-  var SHOP = '{{ shop.permanent_domain }}';
-  var DEBUG = {{ block.settings.debug_mode | default: false }};
+  'use strict';
   
-  // Use App Proxy URL (same-origin, no CORS!)
+  var SHOP = '{{ shop.permanent_domain }}';
+  var DEBUG = true;
+  
+  // Use App Proxy URL (same-origin, no CORS)
   var PROXY_URL = '/apps/pixel-api';
   
-  // Fetch pixel config from app proxy
+  if (DEBUG) console.log('[PixelTracker] Starting for shop:', SHOP);
+  
+  // Fetch pixel config
   fetch(PROXY_URL + '/get-pixel-id?shop=' + encodeURIComponent(SHOP))
-    .then(function(res) { return res.json(); })
+    .then(function(res) {
+      if (DEBUG) console.log('[PixelTracker] Config response:', res.status);
+      return res.json();
+    })
     .then(function(data) {
+      if (DEBUG) console.log('[PixelTracker] Config data:', data);
+      
       if (data.error) {
-        if (DEBUG) console.warn('[PixelTracker]', data.error);
+        console.warn('[PixelTracker] Error:', data.error);
         return;
       }
       
       window.PIXEL_TRACKER_ID = data.pixelId;
       window.PIXEL_TRACKER_CONFIG = data.config || {};
       
-      if (DEBUG) console.log('[PixelTracker] Config loaded:', data);
-      
-      // Load the pixel script via app proxy (no CORS!)
+      // Load the tracking script
       var script = document.createElement('script');
       script.async = true;
-      script.src = PROXY_URL + '/pixel.js?id=' + data.pixelId + '&shop=' + SHOP;
+      script.src = PROXY_URL + '/pixel.js?id=' + data.pixelId + '&shop=' + encodeURIComponent(SHOP);
+      script.onload = function() {
+        if (DEBUG) console.log('[PixelTracker] Script loaded successfully');
+      };
+      script.onerror = function(e) {
+        console.error('[PixelTracker] Script load error:', e);
+      };
       document.head.appendChild(script);
       
       // Load Facebook Pixel if configured
@@ -46,35 +56,19 @@
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', data.metaPixelId);
         fbq('track', 'PageView');
-        if (DEBUG) console.log('[PixelTracker] FB Pixel:', data.metaPixelId);
+        if (DEBUG) console.log('[PixelTracker] FB Pixel initialized:', data.metaPixelId);
       }
     })
     .catch(function(err) {
-      if (DEBUG) console.error('[PixelTracker] Error:', err);
+      console.error('[PixelTracker] Fetch error:', err);
     });
 })();
 </script>
-{% endif %}
 
 {% schema %}
 {
   "name": "Pixel Tracker",
   "target": "head",
-  "settings": [
-    {
-      "type": "checkbox",
-      "id": "enabled",
-      "label": "Enable Pixel Tracker",
-      "default": true,
-      "info": "Enable tracking on your store"
-    },
-    {
-      "type": "checkbox",
-      "id": "debug_mode",
-      "label": "Debug Mode",
-      "default": false,
-      "info": "Show debug info in browser console"
-    }
-  ]
+  "settings": []
 }
 {% endschema %}

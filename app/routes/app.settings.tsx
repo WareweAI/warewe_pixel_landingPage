@@ -132,50 +132,67 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (intent === "delete-script-tags") {
     try {
+      const accessToken = session.accessToken;
+      if (!accessToken) {
+        return { error: "No access token available. Please reinstall the app." };
+      }
+
       // Get all script tags
       const response = await fetch(`https://${session.shop}/admin/api/2024-10/script_tags.json`, {
         method: "GET",
         headers: {
-          "X-Shopify-Access-Token": session.accessToken,
+          "X-Shopify-Access-Token": accessToken,
           "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
-        return { error: "Failed to fetch script tags" };
+        const errorText = await response.text();
+        console.error("Script tags fetch error:", response.status, errorText);
+        return { error: `Failed to fetch script tags: ${response.status}` };
       }
 
       const data = await response.json();
       const scriptTags = data.script_tags || [];
       
-      // Find and delete script tags from our app (pixel-warewe)
+      console.log(`Found ${scriptTags.length} script tags`);
+      
+      // Find and delete script tags from our app (pixel-warewe or pixel.js)
       let deletedCount = 0;
       for (const tag of scriptTags) {
-        if (tag.src && tag.src.includes("pixel-warewe")) {
-          await fetch(`https://${session.shop}/admin/api/2024-10/script_tags/${tag.id}.json`, {
+        if (tag.src && (tag.src.includes("pixel-warewe") || tag.src.includes("pixel.js"))) {
+          console.log(`Deleting script tag: ${tag.id} - ${tag.src}`);
+          const deleteRes = await fetch(`https://${session.shop}/admin/api/2024-10/script_tags/${tag.id}.json`, {
             method: "DELETE",
             headers: {
-              "X-Shopify-Access-Token": session.accessToken,
+              "X-Shopify-Access-Token": accessToken,
             },
           });
-          deletedCount++;
+          if (deleteRes.ok) {
+            deletedCount++;
+          }
         }
       }
 
-      // Also delete from ScriptInjection table
-      await prisma.scriptInjection.deleteMany({
-        where: { shop: session.shop },
-      });
+      // Also delete from ScriptInjection table if it exists
+      try {
+        await prisma.scriptInjection.deleteMany({
+          where: { shop: session.shop },
+        });
+      } catch (e) {
+        // Table might not exist, ignore
+        console.log("ScriptInjection table not available, skipping");
+      }
 
       return { 
         success: true, 
         message: deletedCount > 0 
-          ? `Deleted ${deletedCount} old script tag(s). CORB errors should stop now.`
-          : "No old script tags found. Check if App Embed is enabled in Theme Editor."
+          ? `Deleted ${deletedCount} old script tag(s). CORB errors should stop now. Refresh your store.`
+          : `No old script tags found (checked ${scriptTags.length} tags). The issue may be elsewhere.`
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Delete script tags error:", error);
-      return { error: "Failed to delete script tags" };
+      return { error: `Failed: ${error.message || "Unknown error"}` };
     }
   }
 
