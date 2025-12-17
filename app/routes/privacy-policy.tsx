@@ -1,25 +1,5 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import {
-  Page,
-  Text,
-  BlockStack,
-  Link,
-  InlineStack,
-  Icon,
-} from "@shopify/polaris";
-import {
-  ShieldCheckMarkIcon,
-  DatabaseIcon,
-  LocationIcon,
-  ChartLineIcon,
-  LockIcon,
-  FileIcon,
-  EmailIcon,
-  GlobeIcon,
-  CheckCircleIcon,
-  InfoIcon,
-} from "@shopify/polaris-icons";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const baseUrl = process.env.SHOPIFY_APP_URL || "https://pixel-warewe.vercel.app";
@@ -30,730 +10,471 @@ export default function PrivacyPolicy() {
   const { baseUrl } = useLoaderData<typeof loader>();
 
   return (
-    <Page
-      title="Privacy Policy"
-      subtitle="Last Updated: January 2025"
-      fullWidth
-    >
-      <div style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "40px 24px",
-        backgroundColor: "#ffffff",
-      }}>
-        <style>{`
-          .privacy-content {
-            line-height: 1.8;
-            color: #202223;
-          }
-          .privacy-content h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: #202223;
-            background: linear-gradient(135deg, #008060 0%, #00a082 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-          }
-          .privacy-content h2 {
-            font-size: 1.875rem;
-            font-weight: 600;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            color: #202223;
-            padding-top: 2rem;
-            border-top: 2px solid #e1e3e5;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-          }
-          .privacy-content h3 {
-            font-size: 1.375rem;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-            color: #202223;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-          }
-          .privacy-content p {
-            margin-bottom: 1.25rem;
-            font-size: 1.0625rem;
-            line-height: 1.8;
-            color: #454f5b;
-          }
-          .privacy-content ul {
-            margin: 1.25rem 0;
-            padding-left: 2rem;
-          }
-          .privacy-content li {
-            margin-bottom: 0.875rem;
-            line-height: 1.8;
-            color: #454f5b;
-            position: relative;
-          }
-          .privacy-content li::marker {
-            color: #008060;
-            font-weight: bold;
-          }
-          .privacy-content strong {
-            color: #202223;
-            font-weight: 600;
-          }
-          .privacy-section {
-            background: linear-gradient(135deg, #f6f6f7 0%, #ffffff 100%);
-            padding: 2rem;
-            border-radius: 12px;
-            margin: 1.75rem 0;
-            border-left: 5px solid #008060;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-          }
-          .privacy-section:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-          }
-          .privacy-intro {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #ffffff 100%);
-            padding: 2.5rem;
-            border-radius: 16px;
-            margin-bottom: 3rem;
-            border: 2px solid #008060;
-            box-shadow: 0 4px 16px rgba(0, 128, 96, 0.1);
-            position: relative;
-            overflow: hidden;
-          }
-          .privacy-intro::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #008060, #00a082, #008060);
-          }
-          .privacy-contact {
-            background: linear-gradient(135deg, #f6f6f7 0%, #ffffff 100%);
-            padding: 2.5rem;
-            border-radius: 16px;
-            margin: 2rem 0;
-            border: 2px solid #e1e3e5;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-          }
-          .privacy-resources {
-            background: #ffffff;
-            padding: 2rem;
-            border-radius: 12px;
-            border: 2px solid #e1e3e5;
-            margin: 2rem 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-          }
-          .icon-wrapper {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #008060 0%, #00a082 100%);
-            border-radius: 10px;
-            color: white;
-            flex-shrink: 0;
-          }
-          .section-icon {
-            width: 32px;
-            height: 32px;
-            color: #008060;
-          }
-          .footer-note {
-            text-align: center;
-            margin-top: 4rem;
-            padding: 2.5rem;
-            color: #6d7175;
-            border-top: 2px solid #e1e3e5;
-            background: linear-gradient(135deg, #f6f6f7 0%, #ffffff 100%);
-            border-radius: 12px;
-          }
-          .feature-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #dcfce7;
-            color: #166534;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin: 0.5rem 0.5rem 0.5rem 0;
-          }
-        `}</style>
+    <div style={{
+      minHeight: "100vh",
+      background: "#fafafa",
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        .privacy-container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 80px 24px;
+        }
+        
+        .privacy-header {
+          text-align: center;
+          margin-bottom: 64px;
+        }
+        
+        .privacy-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: white;
+          border: 1px solid #e2e8f0;
+          padding: 8px 16px;
+          border-radius: 100px;
+          font-size: 13px;
+          color: #64748b;
+          margin-bottom: 24px;
+        }
+        
+        .privacy-title {
+          font-size: 48px;
+          font-weight: 700;
+          color: #0f172a;
+          margin: 0 0 16px;
+          letter-spacing: -0.03em;
+        }
+        
+        .privacy-subtitle {
+          font-size: 18px;
+          color: #64748b;
+          margin: 0;
+        }
+        
+        .compliance-badges {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 32px;
+          flex-wrap: wrap;
+        }
+        
+        .compliance-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #f0fdf4;
+          color: #166534;
+          padding: 8px 14px;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 500;
+        }
+        
+        .compliance-badge svg {
+          width: 16px;
+          height: 16px;
+        }
+        
+        .section {
+          margin-bottom: 48px;
+        }
+        
+        .section-title {
+          font-size: 24px;
+          font-weight: 600;
+          color: #0f172a;
+          margin: 0 0 20px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .section-intro {
+          font-size: 16px;
+          color: #475569;
+          line-height: 1.7;
+          margin-bottom: 24px;
+        }
+        
+        .info-card {
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 24px;
+          margin-bottom: 16px;
+        }
+        
+        .info-card-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #0f172a;
+          margin: 0 0 16px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        
+        .info-card-title svg {
+          width: 20px;
+          height: 20px;
+          color: #6366f1;
+        }
+        
+        .info-card ul {
+          margin: 0;
+          padding-left: 20px;
+          color: #475569;
+        }
+        
+        .info-card li {
+          margin-bottom: 10px;
+          line-height: 1.6;
+          font-size: 15px;
+        }
+        
+        .info-card li strong {
+          color: #0f172a;
+        }
+        
+        .info-card p {
+          margin: 0;
+          color: #475569;
+          line-height: 1.7;
+          font-size: 15px;
+        }
+        
+        .note {
+          margin-top: 16px;
+          padding: 12px 16px;
+          background: #f8fafc;
+          border-radius: 8px;
+          font-size: 14px;
+          color: #64748b;
+          font-style: italic;
+        }
+        
+        .contact-card {
+          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+          padding: 32px;
+          text-align: center;
+        }
+        
+        .contact-card h3 {
+          font-size: 20px;
+          font-weight: 600;
+          color: #0f172a;
+          margin: 0 0 8px;
+        }
+        
+        .contact-card .company {
+          font-size: 14px;
+          color: #64748b;
+          margin-bottom: 20px;
+        }
+        
+        .contact-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: #6366f1;
+          text-decoration: none;
+          font-size: 15px;
+          font-weight: 500;
+          margin: 8px 16px;
+        }
+        
+        .contact-link:hover {
+          text-decoration: underline;
+        }
+        
+        .resources-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        
+        .resources-list li {
+          margin-bottom: 12px;
+        }
+        
+        .resources-list a {
+          color: #6366f1;
+          text-decoration: none;
+          font-size: 15px;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+        }
+        
+        .resources-list a:hover {
+          text-decoration: underline;
+        }
+        
+        .footer-note {
+          text-align: center;
+          padding: 40px 0;
+          border-top: 1px solid #e2e8f0;
+          margin-top: 64px;
+          color: #94a3b8;
+          font-size: 14px;
+        }
+      `}</style>
 
-        <div className="privacy-content">
-          <BlockStack gap="600">
-            <h1>
-              <div className="icon-wrapper">
-                <Icon source={ShieldCheckMarkIcon} />
-              </div>
-              Privacy Policy
-            </h1>
-            
-            <div className="privacy-intro">
-              <Text as="p" variant="bodyLg" fontWeight="medium">
-                This Privacy Policy describes how Pixel Tracker ("we", "our", or "us") collects, uses, 
-                and protects your information when you use our analytics and tracking services. 
-                By using our services, you agree to the collection and use of information in accordance 
-                with this policy.
-              </Text>
-              <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                <span className="feature-badge">
-                  <Icon source={CheckCircleIcon} /> GDPR Compliant
-                </span>
-                <span className="feature-badge">
-                  <Icon source={CheckCircleIcon} /> CCPA Compliant
-                </span>
-                <span className="feature-badge">
-                  <Icon source={LockIcon} /> Secure & Encrypted
-                </span>
-              </div>
+      <div className="privacy-container">
+        <header className="privacy-header">
+          <div className="privacy-badge">
+            <svg viewBox="0 0 20 20" fill="none" style={{width: 16, height: 16}}>
+              <path d="M10 1L3 4v5c0 5 3 8 7 10 4-2 7-5 7-10V4l-7-3z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+              <path d="M7 10l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Privacy Policy
+          </div>
+          <h1 className="privacy-title">Your Privacy Matters</h1>
+          <p className="privacy-subtitle">Last updated: January 2025</p>
+          
+          <div className="compliance-badges">
+            <span className="compliance-badge">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+              GDPR Compliant
+            </span>
+            <span className="compliance-badge">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+              CCPA Compliant
+            </span>
+            <span className="compliance-badge">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
+              Encrypted
+            </span>
+          </div>
+        </header>
+
+        <section className="section">
+          <p className="section-intro">
+            This Privacy Policy describes how Pixel Tracker ("we", "our", or "us") collects, uses, 
+            and protects your information when you use our analytics and tracking services. 
+            By using our services, you agree to the collection and use of information in accordance 
+            with this policy.
+          </p>
+        </section>
+
+        <section className="section">
+          <h2 className="section-title">1. Information We Collect</h2>
+          <p className="section-intro">
+            When you visit a website that uses Pixel Tracker, we automatically collect the following types of information:
+          </p>
+
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z"/><path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z"/><path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z"/></svg>
+              Technical Information
+            </h3>
+            <ul>
+              <li><strong>IP Address:</strong> Your Internet Protocol address (may be anonymized)</li>
+              <li><strong>User Agent:</strong> Information about your browser and device</li>
+              <li><strong>Device Information:</strong> Browser type, OS, device type, vendor</li>
+              <li><strong>Screen Information:</strong> Screen dimensions, viewport size</li>
+              <li><strong>Device Fingerprint:</strong> Unique identifier from browser characteristics</li>
+            </ul>
+          </div>
+
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/></svg>
+              Location Information (Optional)
+            </h3>
+            <ul>
+              <li><strong>Country:</strong> Derived from IP address</li>
+              <li><strong>Region/City:</strong> Geographic location (if enabled)</li>
+              <li><strong>Timezone:</strong> Your timezone</li>
+              <li><strong>ISP:</strong> Internet Service Provider</li>
+            </ul>
+            <div className="note">Location tracking can be disabled by the website owner.</div>
+          </div>
+
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+              Browsing Information
+            </h3>
+            <ul>
+              <li><strong>Page URLs:</strong> Pages you visit</li>
+              <li><strong>Referrer:</strong> Source website</li>
+              <li><strong>UTM Parameters:</strong> Campaign tracking data</li>
+              <li><strong>Scroll Depth:</strong> How far you scroll</li>
+              <li><strong>Click Coordinates:</strong> Where you click</li>
+            </ul>
+          </div>
+
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd"/></svg>
+              E-commerce Information
+            </h3>
+            <ul>
+              <li><strong>Product Information:</strong> IDs, names, quantities</li>
+              <li><strong>Transaction Data:</strong> Purchase values, order IDs</li>
+              <li><strong>Cart Information:</strong> Items added, cart values</li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="section">
+          <h2 className="section-title">2. Meta Pixel Integration</h2>
+          <p className="section-intro">
+            When Facebook Pixel integration is enabled, we send event data to Meta's Conversions API for advertising optimization.
+          </p>
+
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"/></svg>
+              Events Sent to Meta
+            </h3>
+            <ul>
+              <li>PageView, ViewContent, AddToCart</li>
+              <li>InitiateCheckout, Purchase</li>
+              <li>Lead, CompleteRegistration</li>
+              <li>Custom events configured by website owner</li>
+            </ul>
+          </div>
+
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
+              Data Security
+            </h3>
+            <p>
+              All personally identifiable information (PII) is hashed using SHA-256 encryption 
+              before being sent to Meta, in accordance with Meta's data processing requirements.
+            </p>
+          </div>
+        </section>
+
+        <section className="section">
+          <h2 className="section-title">3. How We Use Your Information</h2>
+          <div className="info-card">
+            <ul>
+              <li><strong>Analytics:</strong> Provide insights about visitor behavior and traffic</li>
+              <li><strong>Performance:</strong> Track website performance and identify issues</li>
+              <li><strong>Conversion Tracking:</strong> Measure marketing campaign effectiveness</li>
+              <li><strong>E-commerce Analytics:</strong> Analyze shopping behavior and patterns</li>
+              <li><strong>Session Analysis:</strong> Understand user journeys</li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="section">
+          <h2 className="section-title">4. Data Storage & Security</h2>
+          <div className="info-card">
+            <p>
+              All data is stored securely in our cloud infrastructure with industry-standard security measures:
+            </p>
+            <ul style={{marginTop: 16}}>
+              <li>Encryption of data in transit using HTTPS/TLS</li>
+              <li>Secure database storage with access controls</li>
+              <li>Regular security audits and updates</li>
+              <li>Hashing of sensitive information before transmission</li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="section">
+          <h2 className="section-title">5. Your Rights</h2>
+          
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+              Opt-Out Options
+            </h3>
+            <ul>
+              <li>Disable JavaScript in your browser</li>
+              <li>Use "Do Not Track" browser settings</li>
+              <li>Clear browser cookies and storage</li>
+              <li>Use privacy browser extensions</li>
+            </ul>
+          </div>
+
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+              GDPR Rights (EU)
+            </h3>
+            <ul>
+              <li>Right to access, rectify, and erase your data</li>
+              <li>Right to restrict processing</li>
+              <li>Right to data portability</li>
+              <li>Right to withdraw consent</li>
+            </ul>
+          </div>
+
+          <div className="info-card">
+            <h3 className="info-card-title">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"/></svg>
+              CCPA Rights (California)
+            </h3>
+            <p>
+              Right to know what information is collected, right to delete, and right to opt-out. 
+              We do not sell personal information.
+            </p>
+          </div>
+        </section>
+
+        <section className="section">
+          <h2 className="section-title">6. Contact Us</h2>
+          <div className="contact-card">
+            <h3>Pixel Tracker</h3>
+            <p className="company">Warewe Consultancy Private Limited</p>
+            <div>
+              <a href="mailto:support@warewe.online" className="contact-link">
+                <svg viewBox="0 0 20 20" fill="currentColor" style={{width: 18, height: 18}}><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                support@warewe.online
+              </a>
+              <a href="https://pixelify.warewe.online" target="_blank" rel="noopener noreferrer" className="contact-link">
+                <svg viewBox="0 0 20 20" fill="currentColor" style={{width: 18, height: 18}}><path fillRule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.56-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.56.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clipRule="evenodd"/></svg>
+                pixelify.warewe.online
+              </a>
             </div>
+          </div>
+        </section>
 
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={DatabaseIcon} />
-                </div>
-                1. Information We Collect
-              </h2>
-                
-              <Text as="p">
-                When you visit a website that uses Pixel Tracker, we automatically collect the following 
-                types of information:
-              </Text>
+        <section className="section">
+          <h2 className="section-title">Additional Resources</h2>
+          <div className="info-card">
+            <ul className="resources-list">
+              <li>
+                <a href="https://www.facebook.com/privacy/explanation" target="_blank" rel="noopener noreferrer">
+                  → Meta Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="https://developers.facebook.com/docs/marketing-apis/conversions-api" target="_blank" rel="noopener noreferrer">
+                  → Meta Conversions API Documentation
+                </a>
+              </li>
+              <li>
+                <a href="https://gdpr.eu/" target="_blank" rel="noopener noreferrer">
+                  → GDPR Information
+                </a>
+              </li>
+              <li>
+                <a href="https://oag.ca.gov/privacy/ccpa" target="_blank" rel="noopener noreferrer">
+                  → CCPA Information
+                </a>
+              </li>
+            </ul>
+          </div>
+        </section>
 
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Technical Information
-                </h3>
-                <ul>
-                  <li><strong>IP Address:</strong> Your Internet Protocol address (may be anonymized based on settings)</li>
-                  <li><strong>User Agent:</strong> Information about your browser and device</li>
-                  <li><strong>Device Information:</strong> Browser type and version, operating system, device type, device vendor</li>
-                  <li><strong>Screen Information:</strong> Screen width and height, viewport dimensions</li>
-                  <li><strong>Device Fingerprint:</strong> A unique identifier generated from browser and device characteristics</li>
-                </ul>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={LocationIcon} />
-                  </div>
-                  Location Information (Optional)
-                </h3>
-                <ul>
-                  <li><strong>Country and Country Code:</strong> Derived from IP address</li>
-                  <li><strong>Region/State:</strong> Geographic region (if location tracking is enabled)</li>
-                  <li><strong>City:</strong> City-level location (if location tracking is enabled)</li>
-                  <li><strong>ZIP/Postal Code:</strong> Postal code (if location tracking is enabled)</li>
-                  <li><strong>Coordinates:</strong> Approximate latitude and longitude (if location tracking is enabled)</li>
-                  <li><strong>Timezone:</strong> Your timezone</li>
-                  <li><strong>ISP:</strong> Internet Service Provider information</li>
-                </ul>
-                <p style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#6d7175", fontStyle: "italic" }}>
-                  <strong>Note:</strong> Location tracking can be disabled by the website owner in their privacy settings.
-                </p>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ChartLineIcon} />
-                  </div>
-                  Browsing Information
-                </h3>
-                <ul>
-                  <li><strong>Page URLs:</strong> The web pages you visit</li>
-                  <li><strong>Referrer:</strong> The website that referred you to the current page</li>
-                  <li><strong>Page Titles:</strong> The title of pages you view</li>
-                  <li><strong>UTM Parameters:</strong> Marketing campaign tracking parameters (utm_source, utm_medium, utm_campaign, etc.)</li>
-                  <li><strong>Scroll Depth:</strong> How far you scroll on pages</li>
-                  <li><strong>Click Coordinates:</strong> Where you click on pages (X and Y coordinates)</li>
-                </ul>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Session and Visitor Tracking
-                </h3>
-                <ul>
-                  <li><strong>Session ID:</strong> A unique identifier for your browsing session (stored in browser sessionStorage)</li>
-                  <li><strong>Visitor ID:</strong> A unique identifier for you as a visitor (stored in browser localStorage)</li>
-                  <li><strong>Session Duration:</strong> How long you spend on the website</li>
-                  <li><strong>Pageviews:</strong> Number of pages viewed during your session</li>
-                </ul>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ChartLineIcon} />
-                  </div>
-                  E-commerce Information (When Applicable)
-                </h3>
-                <ul>
-                  <li><strong>Product Information:</strong> Product IDs, product names, quantities</li>
-                  <li><strong>Transaction Data:</strong> Purchase values, currency, order IDs</li>
-                  <li><strong>Cart Information:</strong> Items added to cart, cart values</li>
-                  <li><strong>Checkout Data:</strong> Checkout initiation events and values</li>
-                </ul>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Custom Event Data
-                </h3>
-                <ul>
-                  <li><strong>Custom Events:</strong> Website-specific events and interactions you trigger</li>
-                  <li><strong>Event Properties:</strong> Additional data associated with custom events</li>
-                </ul>
-              </div>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={GlobeIcon} />
-                </div>
-                2. Facebook Pixel / Meta Pixel Integration
-              </h2>
-                
-              <Text as="p">
-                When a website owner has enabled Facebook Pixel integration, we send event data to 
-                Meta's Conversions API. This integration allows website owners to track conversions 
-                and optimize their Facebook and Instagram advertising campaigns.
-              </Text>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ChartLineIcon} />
-                  </div>
-                  Events Sent to Meta
-                </h3>
-                <ul>
-                  <li><strong>PageView:</strong> When you view a page</li>
-                  <li><strong>ViewContent:</strong> When you view product or content pages</li>
-                  <li><strong>AddToCart:</strong> When you add items to your shopping cart</li>
-                  <li><strong>InitiateCheckout:</strong> When you begin the checkout process</li>
-                  <li><strong>AddPaymentInfo:</strong> When you add payment information</li>
-                  <li><strong>Purchase:</strong> When you complete a purchase</li>
-                  <li><strong>Lead:</strong> When you submit a lead form</li>
-                  <li><strong>CompleteRegistration:</strong> When you complete a registration</li>
-                  <li><strong>Custom Events:</strong> Website-specific events configured by the website owner</li>
-                </ul>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={LockIcon} />
-                  </div>
-                  Data Sent to Meta
-                </h3>
-                <ul>
-                  <li><strong>Hashed Personal Information:</strong> Email addresses, phone numbers, first names, last names (all hashed using SHA-256 before transmission)</li>
-                  <li><strong>Hashed Location Data:</strong> City, state, ZIP code, country code (hashed using SHA-256)</li>
-                  <li><strong>Technical Data:</strong> IP address, user agent, device fingerprint</li>
-                  <li><strong>Facebook Identifiers:</strong> Facebook Click ID (_fbc cookie) and Facebook Browser ID (_fbp cookie)</li>
-                  <li><strong>Event Data:</strong> Event names, timestamps, URLs, product information, transaction values</li>
-                </ul>
-                <p style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#6d7175", fontStyle: "italic" }}>
-                  All personally identifiable information (PII) is hashed using SHA-256 encryption 
-                  before being sent to Meta, in accordance with Meta's data processing requirements.
-                </p>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={GlobeIcon} />
-                  </div>
-                  Meta's Use of Data
-                </h3>
-                <p>
-                  Data sent to Meta is subject to Meta's Privacy Policy and Data Processing Terms. 
-                  Meta uses this data to:
-                </p>
-                <ul>
-                  <li>Measure the effectiveness of advertising campaigns</li>
-                  <li>Optimize ad delivery and targeting</li>
-                  <li>Provide analytics and insights to website owners</li>
-                  <li>Improve Meta's advertising services</li>
-                </ul>
-                <p style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#6d7175" }}>
-                  For more information about how Meta processes data, please visit{" "}
-                  <Link url="https://www.facebook.com/privacy/explanation" external>
-                    Meta's Privacy Policy
-                  </Link>
-                  .
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={ChartLineIcon} />
-                </div>
-                3. How We Use Your Information
-              </h2>
-              
-              <p>We use the collected information for the following purposes:</p>
-              
-              <ul>
-                <li><strong>Analytics:</strong> To provide website owners with insights about visitor behavior, traffic patterns, and user interactions</li>
-                <li><strong>Performance Monitoring:</strong> To track website performance, identify issues, and improve user experience</li>
-                <li><strong>Conversion Tracking:</strong> To measure the effectiveness of marketing campaigns and track conversions</li>
-                <li><strong>E-commerce Analytics:</strong> To analyze shopping behavior, cart abandonment, and purchase patterns</li>
-                <li><strong>Custom Event Tracking:</strong> To track specific user interactions and events defined by website owners</li>
-                <li><strong>Session Analysis:</strong> To understand user journeys and session patterns</li>
-                <li><strong>Geographic Analysis:</strong> To provide location-based analytics and insights</li>
-                <li><strong>Device Analytics:</strong> To understand device usage patterns and optimize for different devices</li>
-              </ul>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={LockIcon} />
-                </div>
-                4. Data Storage and Retention
-              </h2>
-              
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={LockIcon} />
-                  </div>
-                  Where Data is Stored
-                </h3>
-                <p>
-                  All data collected by Pixel Tracker is stored securely in our database hosted on 
-                  cloud infrastructure. We use industry-standard security measures to protect your data.
-                </p>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Data Retention
-                </h3>
-                <p>
-                  We retain collected data for as long as necessary to provide our services and 
-                  comply with legal obligations. Website owners can configure data retention 
-                  settings, and data may be automatically deleted after a specified period.
-                </p>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={InfoIcon} />
-                  </div>
-                  Browser Storage
-                </h3>
-                <p>
-                  We store session and visitor IDs in your browser's localStorage and sessionStorage. 
-                  These identifiers help us track your visits across sessions while respecting your 
-                  privacy. You can clear this data by clearing your browser's cache and storage.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={GlobeIcon} />
-                </div>
-                5. Data Sharing and Third-Party Services
-              </h2>
-              
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={GlobeIcon} />
-                  </div>
-                  Meta (Facebook) Conversions API
-                </h3>
-                <p>
-                  As described above, when Facebook Pixel integration is enabled, we share event 
-                  data with Meta through their Conversions API. This sharing is subject to Meta's 
-                  Privacy Policy and Data Processing Terms.
-                </p>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Service Providers
-                </h3>
-                <p>
-                  We may share data with trusted service providers who assist us in operating our 
-                  services, such as cloud hosting providers and database services. These providers 
-                  are contractually obligated to protect your data and use it only for the purposes 
-                  we specify.
-                </p>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={FileIcon} />
-                  </div>
-                  Legal Requirements
-                </h3>
-                <p>
-                  We may disclose your information if required by law or in response to valid legal 
-                  requests, such as court orders or subpoenas.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={ShieldCheckMarkIcon} />
-                </div>
-                6. Your Rights and Choices
-              </h2>
-              
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CheckCircleIcon} />
-                  </div>
-                  Opt-Out Options
-                </h3>
-                <ul>
-                  <li><strong>Browser Settings:</strong> You can disable JavaScript in your browser to prevent tracking, though this may affect website functionality</li>
-                  <li><strong>Do Not Track:</strong> We respect browser "Do Not Track" signals, though implementation may vary by website</li>
-                  <li><strong>Clear Browser Data:</strong> You can clear cookies, localStorage, and sessionStorage to remove stored identifiers</li>
-                  <li><strong>Privacy Extensions:</strong> You can use browser extensions that block tracking scripts</li>
-                </ul>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Data Access and Deletion
-                </h3>
-                <p>
-                  If you wish to access, correct, or delete your personal data, please contact the 
-                  website owner who is using Pixel Tracker, or contact us directly using the 
-                  information provided below.
-                </p>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ShieldCheckMarkIcon} />
-                  </div>
-                  European Privacy Rights (GDPR)
-                </h3>
-                <p>
-                  If you are located in the European Economic Area (EEA), you have additional rights 
-                  under the General Data Protection Regulation (GDPR), including:
-                </p>
-                <ul>
-                  <li>Right to access your personal data</li>
-                  <li>Right to rectify inaccurate data</li>
-                  <li>Right to erasure ("right to be forgotten")</li>
-                  <li>Right to restrict processing</li>
-                  <li>Right to data portability</li>
-                  <li>Right to object to processing</li>
-                  <li>Right to withdraw consent</li>
-                </ul>
-              </div>
-
-              <div className="privacy-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ShieldCheckMarkIcon} />
-                  </div>
-                  California Privacy Rights (CCPA)
-                </h3>
-                <p>
-                  If you are a California resident, you have rights under the California Consumer 
-                  Privacy Act (CCPA), including the right to know what personal information is 
-                  collected, the right to delete personal information, and the right to opt-out 
-                  of the sale of personal information (we do not sell personal information).
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={LockIcon} />
-                </div>
-                7. Security Measures
-              </h2>
-              
-              <p>
-                We implement industry-standard security measures to protect your data, including:
-              </p>
-              
-              <ul>
-                <li>Encryption of data in transit using HTTPS/TLS</li>
-                <li>Secure database storage with access controls</li>
-                <li>Regular security audits and updates</li>
-                <li>Hashing of sensitive personal information before transmission to third parties</li>
-                <li>Access controls and authentication for our systems</li>
-              </ul>
-              
-              <p style={{ marginTop: "1rem", color: "#6d7175", fontStyle: "italic" }}>
-                However, no method of transmission over the Internet or electronic storage is 100% 
-                secure. While we strive to use commercially acceptable means to protect your data, 
-                we cannot guarantee absolute security.
-              </p>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={ShieldCheckMarkIcon} />
-                </div>
-                8. Children's Privacy
-              </h2>
-              
-              <p>
-                Our services are not intended for children under the age of 13. We do not knowingly 
-                collect personal information from children under 13. If you believe we have 
-                inadvertently collected information from a child under 13, please contact us 
-                immediately so we can delete such information.
-              </p>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={FileIcon} />
-                </div>
-                9. Changes to This Privacy Policy
-              </h2>
-              
-              <p>
-                We may update this Privacy Policy from time to time. We will notify you of any 
-                changes by posting the new Privacy Policy on this page and updating the "Last Updated" 
-                date. You are advised to review this Privacy Policy periodically for any changes.
-              </p>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={EmailIcon} />
-                </div>
-                10. Contact Us
-              </h2>
-              
-              <p>
-                If you have any questions about this Privacy Policy or our data practices, please 
-                contact us:
-              </p>
-              
-              <div className="privacy-contact">
-                <InlineStack gap="300" align="start">
-                  <div className="icon-wrapper">
-                    <Icon source={EmailIcon} />
-                  </div>
-                  <BlockStack gap="200">
-                    <h3>Pixel Tracker</h3>
-                    <p><strong>Warewe Consultancy Private Limited</strong></p>
-                    <p>
-                      <span style={{ marginRight: "0.5rem" }}>
-                        <Icon source={EmailIcon} />
-                      </span>
-                      Email: <Link url="mailto:support@warewe.online">support@warewe.online</Link>
-                    </p>
-                    <p>
-                      <span style={{ marginRight: "0.5rem" }}>
-                        <Icon source={GlobeIcon} />
-                      </span>
-                      Website: <Link url="pixelify.warewe.online" external>pixelify.warewe.online
-                      </Link>
-                    </p>
-                  </BlockStack>
-                </InlineStack>
-              </div>
-            </section>
-
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={GlobeIcon} />
-                </div>
-                Additional Resources
-              </h2>
-              
-              <div className="privacy-resources">
-                <ul>
-                  <li>
-                    <Link url="https://www.facebook.com/privacy/explanation" external>
-                      Meta (Facebook) Privacy Policy
-                    </Link>
-                  </li>
-                  <li>
-                    <Link url="https://developers.facebook.com/docs/marketing-apis/conversions-api" external>
-                      Meta Conversions API Documentation
-                    </Link>
-                  </li>
-                  <li>
-                    <Link url="https://gdpr.eu/" external>
-                      General Data Protection Regulation (GDPR) Information
-                    </Link>
-                  </li>
-                  <li>
-                    <Link url="https://oag.ca.gov/privacy/ccpa" external>
-                      California Consumer Privacy Act (CCPA) Information
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </section>
-
-            <div className="footer-note">
-              <div style={{ width: "32px", height: "32px", margin: "0 auto 1rem", color: "#008060" }}>
-                <Icon source={ShieldCheckMarkIcon} />
-              </div>
-              <p style={{ fontSize: "1rem", fontWeight: "500" }}>
-                This Privacy Policy is effective as of January 2025 and applies to all users of 
-                Pixel Tracker services.
-              </p>
-            </div>
-          </BlockStack>
-        </div>
+        <footer className="footer-note">
+          This Privacy Policy is effective as of January 2025 and applies to all users of Pixel Tracker services.
+        </footer>
       </div>
-    </Page>
+    </div>
   );
 }
