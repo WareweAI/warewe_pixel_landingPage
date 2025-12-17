@@ -17,7 +17,6 @@ import {
   ChartLineIcon,
   DatabaseIcon,
   CheckCircleIcon,
-  InfoIcon,
   BookOpenIcon,
   PlayIcon,
   WrenchIcon,
@@ -47,1119 +46,965 @@ export default function DocsPage() {
   const { baseUrl } = useLoaderData<typeof loader>();
 
   return (
-    <Page
-      title="Documentation"
-      subtitle="Complete Guide to Pixel Tracker"
-      fullWidth
-    >
+    <Page fullWidth>
       <div style={{
-        maxWidth: "1200px",
-        margin: "0 auto",
-        padding: "40px 24px",
-        backgroundColor: "#ffffff",
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)",
       }}>
         <style>{`
-          .docs-content {
-            line-height: 1.8;
-            color: #202223;
+          @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+          
+          .docs-page {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #e2e8f0;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 32px 80px;
           }
-          .docs-content h1 {
-            font-size: 3rem;
+          
+          /* Hero Section */
+          .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+            position: relative;
+          }
+          .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+          }
+          .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            color: #a5b4fc;
+            margin-bottom: 24px;
+          }
+          .hero h1 {
+            font-size: 4rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
-            color: #202223;
-            background: linear-gradient(135deg, #5c6ac4 0%, #006fbb 100%);
+            margin: 0 0 20px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #6366f1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: -0.02em;
+          }
+          .hero-subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.7;
+          }
+          .hero-features {
             display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+          }
+          .feature-pill {
+            display: inline-flex;
             align-items: center;
-            gap: 1rem;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: #e2e8f0;
+            transition: all 0.3s ease;
           }
-          .docs-content h2 {
-            font-size: 1.875rem;
-            font-weight: 600;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            color: #202223;
-            padding-top: 2rem;
-            border-top: 2px solid #e1e3e5;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-          }
-          .docs-content h3 {
-            font-size: 1.375rem;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 1rem;
-            color: #202223;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-          }
-          .docs-content p {
-            margin-bottom: 1.25rem;
-            font-size: 1.0625rem;
-            line-height: 1.8;
-            color: #454f5b;
-          }
-          .docs-content ul, .docs-content ol {
-            margin: 1.25rem 0;
-            padding-left: 2rem;
-          }
-          .docs-content li {
-            margin-bottom: 0.875rem;
-            line-height: 1.8;
-            color: #454f5b;
-            position: relative;
-          }
-          .docs-content li::marker {
-            color: #5c6ac4;
-            font-weight: bold;
-          }
-          .docs-content strong {
-            color: #202223;
-            font-weight: 600;
-          }
-          .docs-section {
-            background: linear-gradient(135deg, #f6f6f7 0%, #ffffff 100%);
-            padding: 2rem;
-            border-radius: 12px;
-            margin: 1.75rem 0;
-            border-left: 5px solid #5c6ac4;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-          }
-          .docs-section:hover {
+          .feature-pill:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           }
-          .docs-intro {
-            background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 50%, #ffffff 100%);
-            padding: 2.5rem;
+          .feature-pill svg {
+            width: 18px;
+            height: 18px;
+            color: #6366f1;
+          }
+          
+          /* Table of Contents */
+          .toc {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 32px;
+            margin: 48px 0 64px;
+            backdrop-filter: blur(10px);
+          }
+          .toc h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #a5b4fc;
+            margin: 0 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+          }
+          .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 8px;
+          }
+          .toc-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+          }
+          .toc-link:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: #fff;
+            transform: translateX(4px);
+          }
+          .toc-link span {
+            font-size: 1.1rem;
+          }
+          
+          /* Section Styles */
+          .section {
+            margin: 80px 0;
+            scroll-margin-top: 40px;
+          }
+          .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+          }
+          .section-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+          }
+          .section-icon svg {
+            width: 24px;
+            height: 24px;
+          }
+          .section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            letter-spacing: -0.01em;
+          }
+          .section-intro {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            line-height: 1.8;
+            margin-bottom: 32px;
+          }
+          
+          /* Cards */
+          .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 16px;
-            margin-bottom: 3rem;
-            border: 2px solid #5c6ac4;
-            box-shadow: 0 4px 16px rgba(92, 106, 196, 0.1);
+            padding: 28px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+          }
+          .card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+          }
+          .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+          .card p {
+            color: #94a3b8;
+            line-height: 1.8;
+            margin: 0 0 16px;
+          }
+          .card ul, .card ol {
+            margin: 16px 0;
+            padding-left: 24px;
+          }
+          .card li {
+            color: #cbd5e1;
+            margin: 10px 0;
+            line-height: 1.7;
+          }
+          .card li::marker {
+            color: #6366f1;
+          }
+          .card strong {
+            color: #fff;
+            font-weight: 600;
+          }
+          
+          /* Step Cards */
+          .step-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 16px;
+            padding: 28px;
+            margin: 16px 0;
             position: relative;
             overflow: hidden;
           }
-          .docs-intro::before {
+          .step-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #5c6ac4, #006fbb, #5c6ac4);
-          }
-          .code-block {
-            background: #1e1e2e;
-            color: #cdd6f4;
-            padding: 1.5rem;
-            border-radius: 12px;
-            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            overflow-x: auto;
-            margin: 1rem 0;
-            border: 1px solid #313244;
-          }
-          .code-block .comment {
-            color: #6c7086;
-          }
-          .code-block .keyword {
-            color: #cba6f7;
-          }
-          .code-block .string {
-            color: #a6e3a1;
-          }
-          .code-block .function {
-            color: #89b4fa;
-          }
-          .code-block .property {
-            color: #f9e2af;
-          }
-          .code-block .number {
-            color: #fab387;
-          }
-          .inline-code {
-            background: #f0f4ff;
-            color: #5c6ac4;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
-            font-size: 0.9em;
-          }
-          .icon-wrapper {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #5c6ac4 0%, #006fbb 100%);
-            border-radius: 10px;
-            color: white;
-            flex-shrink: 0;
-          }
-          .section-icon {
-            width: 32px;
-            height: 32px;
-            color: #5c6ac4;
-          }
-          .footer-note {
-            text-align: center;
-            margin-top: 4rem;
-            padding: 2.5rem;
-            color: #6d7175;
-            border-top: 2px solid #e1e3e5;
-            background: linear-gradient(135deg, #f6f6f7 0%, #ffffff 100%);
-            border-radius: 12px;
-          }
-          .feature-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: #e8f0fe;
-            color: #1a56db;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin: 0.5rem 0.5rem 0.5rem 0;
-          }
-          .toc-container {
-            background: #f6f6f7;
-            padding: 2rem;
-            border-radius: 12px;
-            margin: 2rem 0;
-            border: 1px solid #e1e3e5;
-          }
-          .toc-container ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 0.75rem;
-          }
-          .toc-container li {
-            margin: 0;
-          }
-          .toc-container a {
-            color: #5c6ac4;
-            text-decoration: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: background 0.2s;
-          }
-          .toc-container a:hover {
-            background: #e8f0fe;
-          }
-          .warning-box {
-            background: #fff8e6;
-            border-left: 5px solid #ffb347;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-          }
-          .info-box {
-            background: #e8f4fd;
-            border-left: 5px solid #006fbb;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-          }
-          .success-box {
-            background: #dcfce7;
-            border-left: 5px solid #22c55e;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 1rem 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
           }
           .step-number {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: #5c6ac4;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 10px;
             color: white;
-            border-radius: 50%;
-            font-weight: 600;
-            font-size: 0.875rem;
-            margin-right: 0.75rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-right: 12px;
           }
-          .event-table {
+          .step-card h3 {
+            display: flex;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 12px;
+          }
+          .step-card p {
+            color: #94a3b8;
+            line-height: 1.8;
+            margin: 0;
+          }
+          
+          /* Code Blocks */
+          .code-block {
+            background: #0d1117;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 16px 0;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.7;
+          }
+          .code-block .comment { color: #6e7681; }
+          .code-block .keyword { color: #ff7b72; }
+          .code-block .string { color: #a5d6ff; }
+          .code-block .function { color: #d2a8ff; }
+          .code-block .property { color: #79c0ff; }
+          .code-block .number { color: #ffa657; }
+          
+          .inline-code {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+          }
+          
+          /* Alert Boxes */
+          .alert {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            display: flex;
+            gap: 16px;
+          }
+          .alert-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+          }
+          .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+          }
+          .alert-success .alert-icon { color: #22c55e; }
+          .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+          }
+          .alert-info .alert-icon { color: #3b82f6; }
+          .alert-warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+          }
+          .alert-warning .alert-icon { color: #fbbf24; }
+          .alert-content {
+            flex: 1;
+          }
+          .alert-content strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 4px;
+          }
+          .alert-content p {
+            color: #94a3b8;
+            margin: 0;
+            line-height: 1.6;
+          }
+          
+          /* Tables */
+          .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+          }
+          .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 1rem 0;
           }
-          .event-table th, .event-table td {
-            padding: 1rem;
+          .data-table th {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 14px 20px;
             text-align: left;
-            border-bottom: 1px solid #e1e3e5;
-          }
-          .event-table th {
-            background: #f6f6f7;
             font-weight: 600;
-            color: #202223;
+            color: #a5b4fc;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
           }
-          .event-table tr:hover {
-            background: #f9fafb;
+          .data-table td {
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+          }
+          .data-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+          }
+          
+          /* Footer */
+          .footer {
+            margin-top: 100px;
+            padding: 48px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            text-align: center;
+          }
+          .footer-logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+          }
+          .footer h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 8px;
+          }
+          .footer p {
+            color: #94a3b8;
+            margin: 8px 0;
+          }
+          .footer a {
+            color: #a5b4fc;
+            text-decoration: none;
+            transition: color 0.2s;
+          }
+          .footer a:hover {
+            color: #fff;
+          }
+          .footer-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            margin: 32px 0;
+          }
+          .footer-bottom {
+            font-size: 0.875rem;
+            color: #64748b;
+          }
+          
+          /* Responsive */
+          @media (max-width: 768px) {
+            .docs-page { padding: 40px 20px; }
+            .hero h1 { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .section h2 { font-size: 1.5rem; }
+            .toc-grid { grid-template-columns: 1fr; }
           }
         `}</style>
 
-        <div className="docs-content">
-          <BlockStack gap="600">
-            <h1>
-              <div className="icon-wrapper">
-                <Icon source={BookOpenIcon} />
+        <div className="docs-page">
+          {/* Hero Section */}
+          <div className="hero">
+            <div className="hero-badge">
+              <span>📚</span> Documentation
+            </div>
+            <h1>Pixel Tracker</h1>
+            <p className="hero-subtitle">
+              The complete guide to implementing powerful, adblocker-proof analytics 
+              on your Shopify store. Get started in under 3 minutes.
+            </p>
+            <div className="hero-features">
+              <div className="feature-pill">
+                <Icon source={CheckCircleIcon} />
+                Zero-Code Setup
               </div>
-              Pixel Tracker Documentation
-            </h1>
+              <div className="feature-pill">
+                <Icon source={LockIcon} />
+                Anti-Adblocker
+              </div>
+              <div className="feature-pill">
+                <Icon source={ChartLineIcon} />
+                Real-time Analytics
+              </div>
+              <div className="feature-pill">
+                <Icon source={TargetIcon} />
+                Meta Integration
+              </div>
+              <div className="feature-pill">
+                <Icon source={CartIcon} />
+                E-commerce Tracking
+              </div>
+            </div>
+          </div>
+
+          {/* Table of Contents */}
+          <div className="toc">
+            <h3>
+              <Icon source={ClipboardIcon} />
+              Quick Navigation
+            </h3>
+            <div className="toc-grid">
+              <a href="#quick-start" className="toc-link"><span>🚀</span> Quick Start</a>
+              <a href="#how-it-works" className="toc-link"><span>⚙️</span> How It Works</a>
+              <a href="#dashboard" className="toc-link"><span>📊</span> Dashboard</a>
+              <a href="#meta-pixel" className="toc-link"><span>🎯</span> Meta Pixel</a>
+              <a href="#auto-tracking" className="toc-link"><span>⚡</span> Auto Tracking</a>
+              <a href="#custom-events" className="toc-link"><span>🛠️</span> Custom Events</a>
+              <a href="#ecommerce" className="toc-link"><span>🛒</span> E-commerce</a>
+              <a href="#api" className="toc-link"><span>💻</span> JavaScript API</a>
+              <a href="#settings" className="toc-link"><span>⚙️</span> Settings</a>
+              <a href="#troubleshooting" className="toc-link"><span>🔧</span> Troubleshooting</a>
+              <a href="#faq" className="toc-link"><span>❓</span> FAQ</a>
+            </div>
+          </div>
+
+          {/* Quick Start */}
+          <section id="quick-start" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={PlayIcon} />
+              </div>
+              <h2>Quick Start</h2>
+            </div>
             
-            <div className="docs-intro">
-              <Text as="p" variant="bodyLg" fontWeight="medium">
-                Welcome to the complete documentation for Pixel Tracker. This guide covers everything 
-                from basic installation to advanced custom event tracking, Facebook/Meta Pixel integration, 
-                and e-commerce analytics. Follow this documentation to maximize your tracking capabilities.
-              </Text>
-              <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-                <span className="feature-badge">
-                  <Icon source={CheckCircleIcon} /> Zero-Code Installation
-                </span>
-                <span className="feature-badge">
-                  <Icon source={ChartLineIcon} /> Real-time Analytics
-                </span>
-                <span className="feature-badge">
-                  <Icon source={TargetIcon} /> Meta Pixel Integration
-                </span>
-                <span className="feature-badge">
-                  <Icon source={CartIcon} /> E-commerce Tracking
-                </span>
-                <span className="feature-badge">
-                  <Icon source={LockIcon} /> Anti-Adblocker
-                </span>
+            <div className="alert alert-success">
+              <div className="alert-icon">
+                <Icon source={CheckCircleIcon} />
+              </div>
+              <div className="alert-content">
+                <strong>3-Minute Setup</strong>
+                <p>No theme editing required! Just enable the App Embed and start tracking.</p>
               </div>
             </div>
 
-            {/* Table of Contents */}
-            <div className="toc-container">
-              <h3 style={{ marginTop: 0, marginBottom: "1rem" }}>
-                <Icon source={ClipboardIcon} /> Table of Contents
-              </h3>
+            <div className="step-card">
+              <h3><span className="step-number">1</span> Install the App</h3>
+              <p>Install Pixel Tracker from the Shopify App Store. You'll be redirected to the dashboard automatically.</p>
+            </div>
+
+            <div className="step-card">
+              <h3><span className="step-number">2</span> Create Your Pixel</h3>
+              <p>Go to <strong>Facebook Pixels</strong> → Click <strong>"Add Facebook Pixel"</strong> → Enter a name. Optionally add your Meta Pixel ID.</p>
+            </div>
+
+            <div className="step-card">
+              <h3><span className="step-number">3</span> Enable App Embed</h3>
+              <p>This is the key step! Go to <strong>Online Store → Themes → Customize</strong> → Click the <strong>puzzle icon</strong> (App embeds) → Toggle <strong>"Pixel Tracker" ON</strong> → <strong>Save</strong></p>
+            </div>
+
+            <div className="step-card">
+              <h3><span className="step-number">4</span> Verify Installation</h3>
+              <p>Visit your store, open DevTools (F12) → Console. Look for <code className="inline-code">[PixelTracker]</code> messages. Check your dashboard for the first pageview!</p>
+            </div>
+
+            <div className="code-block">
+              <span className="comment">// Expected console output:</span>{'\n'}
+              <span className="string">[PixelTracker] Starting for shop: your-store.myshopify.com</span>{'\n'}
+              <span className="string">[PixelTracker] Config response: 200</span>{'\n'}
+              <span className="string">[PixelTracker] Ready: pixel_xxxxx</span>{'\n'}
+              <span className="string">[PixelTracker] pageview {'{ url: "...", ... }'}</span>{'\n'}
+              <span className="string">[PixelTracker] Track response: 200</span>
+            </div>
+          </section>
+
+          {/* How It Works */}
+          <section id="how-it-works" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={SettingsIcon} />
+              </div>
+              <h2>How It Works</h2>
+            </div>
+            
+            <p className="section-intro">
+              Pixel Tracker uses a sophisticated server-side architecture that makes tracking immune to ad blockers.
+            </p>
+
+            <div className="card">
+              <h3><Icon source={GlobeIcon} /> Architecture</h3>
+              <ol>
+                <li><strong>Theme App Extension:</strong> Injects a small script into your store's head</li>
+                <li><strong>Shopify App Proxy:</strong> Routes all requests through your store's domain</li>
+                <li><strong>Server Processing:</strong> Geo-location, device detection, session tracking</li>
+                <li><strong>Database Storage:</strong> Secure storage for analytics</li>
+                <li><strong>Meta Conversions API:</strong> Server-side forwarding to Facebook (optional)</li>
+              </ol>
+            </div>
+
+            <div className="card">
+              <h3><Icon source={LockIcon} /> Anti-Adblocker Technology</h3>
+              <p>
+                All tracking requests go through your store's domain via Shopify App Proxy. 
+                Ad blockers cannot distinguish tracking from normal store requests.
+              </p>
               <ul>
-                <li><a href="#quick-start">🚀 Quick Start (3 Minutes)</a></li>
-                <li><a href="#how-it-works">⚙️ How It Works</a></li>
-                <li><a href="#dashboard">📊 Dashboard Overview</a></li>
-                <li><a href="#pixels">🎯 Facebook/Meta Pixels</a></li>
-                <li><a href="#auto-tracking">⚡ Automatic Tracking</a></li>
-                <li><a href="#custom-events">🛠️ Custom Events</a></li>
-                <li><a href="#ecommerce">🛒 E-commerce Tracking</a></li>
-                <li><a href="#javascript-api">💻 JavaScript API</a></li>
-                <li><a href="#settings">⚙️ Settings</a></li>
-                <li><a href="#troubleshooting">🔧 Troubleshooting</a></li>
-                <li><a href="#faq">❓ FAQ</a></li>
+                <li>✓ 100% event capture regardless of ad blockers</li>
+                <li>✓ No CORS errors (same-origin requests)</li>
+                <li>✓ Better accuracy than traditional pixels</li>
               </ul>
             </div>
 
-            {/* Quick Start */}
-            <section id="quick-start">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={PlayIcon} />
-                </div>
-                1. Quick Start Guide (3 Minutes)
-              </h2>
-              
-              <div className="success-box">
-                <strong>Zero-Code Setup:</strong> No theme editing required! Just enable the App Embed and you're done.
-              </div>
-              
-              <div className="docs-section">
-                <h3><span className="step-number">1</span> Install the App</h3>
-                <p>
-                  Install Pixel Tracker from the Shopify App Store. Once installed, you'll be redirected 
-                  to the app dashboard automatically.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3><span className="step-number">2</span> Create Your First Pixel</h3>
-                <p>
-                  Navigate to <strong>Facebook Pixels</strong> in the sidebar and click <strong>"Add Facebook Pixel"</strong>. 
-                  Enter a name for your pixel. Optionally add your Facebook Pixel ID for Meta integration.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3><span className="step-number">3</span> Enable the App Embed (Required)</h3>
-                <p>
-                  This is the most important step! Enable the tracking script on your store:
-                </p>
-                <ol>
-                  <li>Go to <strong>Online Store → Themes</strong> in your Shopify Admin</li>
-                  <li>Click <strong>Customize</strong> on your active theme</li>
-                  <li>Click the <strong>puzzle icon</strong> (App embeds) in the left sidebar</li>
-                  <li>Find <strong>"Pixel Tracker"</strong> and toggle it <strong>ON</strong></li>
-                  <li>Click <strong>Save</strong> in the top right</li>
-                </ol>
-                <div className="info-box">
-                  <strong>Why App Embed?</strong> This method uses Shopify's App Proxy to route all tracking 
-                  requests through your store's domain, making it immune to ad blockers and avoiding CORS errors.
-                </div>
-              </div>
-
-              <div className="docs-section">
-                <h3><span className="step-number">4</span> Verify Installation</h3>
-                <p>
-                  Visit your store in a new browser tab. Open DevTools (F12) → Console. You should see:
-                </p>
-                <div className="code-block">
-                  <span className="comment">[PixelTracker] Starting for shop: your-store.myshopify.com</span>{'\n'}
-                  <span className="comment">[PixelTracker] Config response: 200</span>{'\n'}
-                  <span className="comment">[PixelTracker] Config data: {'{'}pixelId: '...', ...{'}'}</span>{'\n'}
-                  <span className="comment">[PixelTracker] Ready: pixel_xxxxx</span>{'\n'}
-                  <span className="comment">[PixelTracker] pageview {'{'}...{'}'}</span>{'\n'}
-                  <span className="comment">[PixelTracker] Track response: 200</span>
-                </div>
-                <p>
-                  Check your Pixel Tracker dashboard - you should see your first pageview event within seconds!
-                </p>
-              </div>
-            </section>
-
-            {/* How It Works */}
-            <section id="how-it-works">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={SettingsIcon} />
-                </div>
-                2. How It Works
-              </h2>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={GlobeIcon} />
-                  </div>
-                  Architecture Overview
-                </h3>
-                <p>
-                  Pixel Tracker uses a sophisticated server-side tracking architecture:
-                </p>
-                <ol>
-                  <li><strong>Theme App Extension (App Embed):</strong> Injects a small script into your store's {'<head>'}</li>
-                  <li><strong>Shopify App Proxy:</strong> Routes requests through <code className="inline-code">/apps/pixel-api/*</code> on your store domain</li>
-                  <li><strong>Server-Side Processing:</strong> Events are processed on our servers with geo-location, device detection, and session tracking</li>
-                  <li><strong>Database Storage:</strong> All events are stored securely for analytics</li>
-                  <li><strong>Meta Conversions API:</strong> Events are forwarded to Facebook server-side (optional)</li>
-                </ol>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={LockIcon} />
-                  </div>
-                  Anti-Adblocker Technology
-                </h3>
-                <p>
-                  Because all tracking requests go through your store's domain (via Shopify App Proxy), 
-                  ad blockers cannot distinguish tracking requests from normal store requests. This ensures:
-                </p>
-                <ul>
-                  <li>100% event capture regardless of ad blockers</li>
-                  <li>No CORS errors (same-origin requests)</li>
-                  <li>Better data accuracy than traditional pixel tracking</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Data Collected
-                </h3>
-                <table className="event-table">
-                  <thead>
-                    <tr>
-                      <th>Data Type</th>
-                      <th>Description</th>
-                      <th>Configurable</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Page URL</strong></td>
-                      <td>Full URL of the visited page</td>
-                      <td>Always collected</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Referrer</strong></td>
-                      <td>Where the visitor came from</td>
-                      <td>Always collected</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Device Info</strong></td>
-                      <td>Browser, OS, screen size</td>
-                      <td>Always collected</td>
-                    </tr>
-                    <tr>
-                      <td><strong>IP Address</strong></td>
-                      <td>Visitor's IP (for geo-location)</td>
-                      <td>Can be disabled</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Location</strong></td>
-                      <td>City, region, country</td>
-                      <td>Can be disabled</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Session ID</strong></td>
-                      <td>Unique session identifier</td>
-                      <td>Can be disabled</td>
-                    </tr>
-                    <tr>
-                      <td><strong>UTM Parameters</strong></td>
-                      <td>Marketing campaign data</td>
-                      <td>Always collected</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            {/* Dashboard Overview */}
-            <section id="dashboard">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={ChartLineIcon} />
-                </div>
-                3. Dashboard Overview
-              </h2>
-              
-              <p>
-                The Pixel Tracker dashboard provides comprehensive analytics for your store:
-              </p>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ChartLineIcon} />
-                  </div>
-                  Main Dashboard
-                </h3>
-                <ul>
-                  <li><strong>Total Events:</strong> Count of all tracked events</li>
-                  <li><strong>Unique Visitors:</strong> Number of unique visitors</li>
-                  <li><strong>Page Views:</strong> Total page view count</li>
-                  <li><strong>Sessions:</strong> Browsing session count</li>
-                  <li><strong>Active Now:</strong> Real-time visitor count (last 5 minutes)</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ViewIcon} />
-                  </div>
-                  Analytics Page
-                </h3>
-                <ul>
-                  <li><strong>Traffic Sources:</strong> Where your visitors come from</li>
-                  <li><strong>Device Breakdown:</strong> Desktop vs Mobile vs Tablet</li>
-                  <li><strong>Browser Statistics:</strong> Chrome, Safari, Firefox, etc.</li>
-                  <li><strong>Geographic Data:</strong> Countries, regions, cities</li>
-                  <li><strong>Top Events:</strong> Most frequent event types</li>
-                  <li><strong>Top Pages:</strong> Most visited URLs</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={PersonIcon} />
-                  </div>
-                  Visitors Page
-                </h3>
-                <ul>
-                  <li><strong>Visitor List:</strong> All tracked visitors with their activity</li>
-                  <li><strong>Session Details:</strong> Pages viewed, time on site</li>
-                  <li><strong>Device Info:</strong> Browser, OS, screen size</li>
-                  <li><strong>Location:</strong> Country and city</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Events Page
-                </h3>
-                <ul>
-                  <li><strong>Event Stream:</strong> Real-time feed of all events</li>
-                  <li><strong>Event Filtering:</strong> Filter by event type, date</li>
-                  <li><strong>Event Details:</strong> Full payload for each event</li>
-                </ul>
-              </div>
-            </section>
-
-            {/* Facebook/Meta Pixels */}
-            <section id="pixels">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={TargetIcon} />
-                </div>
-                4. Facebook/Meta Pixel Integration
-              </h2>
-
-              <p>
-                Pixel Tracker integrates with Facebook/Meta Pixel through both browser-side and 
-                server-side (Conversions API) tracking.
-              </p>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={SettingsIcon} />
-                  </div>
-                  Setting Up Meta Integration
-                </h3>
-                <ol>
-                  <li>Go to <Link url="https://business.facebook.com/events_manager" external>Meta Events Manager</Link></li>
-                  <li>Select or create a Pixel</li>
-                  <li>Copy your <strong>Pixel ID</strong> (16-digit number)</li>
-                  <li>In Pixel Tracker, go to <strong>Settings</strong></li>
-                  <li>Select your pixel and enable <strong>Meta Pixel Integration</strong></li>
-                  <li>Enter your Pixel ID</li>
-                  <li>Optionally add your <strong>Conversions API Access Token</strong> for server-side tracking</li>
-                </ol>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ChartLineIcon} />
-                  </div>
-                  Events Sent to Meta
-                </h3>
-                <table className="event-table">
-                  <thead>
-                    <tr>
-                      <th>Event</th>
-                      <th>Trigger</th>
-                      <th>Data Sent</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>PageView</strong></td>
-                      <td>Every page load</td>
-                      <td>URL, title, referrer</td>
-                    </tr>
-                    <tr>
-                      <td><strong>ViewContent</strong></td>
-                      <td>Product page view</td>
-                      <td>Product ID, name, price</td>
-                    </tr>
-                    <tr>
-                      <td><strong>AddToCart</strong></td>
-                      <td>Add to cart action</td>
-                      <td>Product ID, quantity, value</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Purchase</strong></td>
-                      <td>Order completed (webhook)</td>
-                      <td>Order ID, value, products</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="warning-box">
-                <strong>Important:</strong> The Conversions API access token is sensitive. 
-                Never share it publicly.
-              </div>
-            </section>
-
-            {/* Automatic Tracking */}
-            <section id="auto-tracking">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={ViewIcon} />
-                </div>
-                5. Automatic Tracking
-              </h2>
-              
-              <p>
-                Pixel Tracker automatically captures various user interactions without any additional code.
-                Configure these in <strong>Settings</strong>:
-              </p>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ViewIcon} />
-                  </div>
-                  Page Views (Default: ON)
-                </h3>
-                <ul>
-                  <li>Captured on every page load</li>
-                  <li>Includes full URL, page title, and referrer</li>
-                  <li>Tracks UTM parameters automatically</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={TargetIcon} />
-                  </div>
-                  Click Tracking (Default: ON)
-                </h3>
-                <ul>
-                  <li>Tracks clicks on links, buttons, and interactive elements</li>
-                  <li>Records element type, text content, and href</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ChartLineIcon} />
-                  </div>
-                  Scroll Depth (Default: OFF)
-                </h3>
-                <ul>
-                  <li>Tracks how far users scroll on each page</li>
-                  <li>Recorded at 25%, 50%, 75%, and 100% thresholds</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={GlobeIcon} />
-                  </div>
-                  UTM Parameters (Always ON)
-                </h3>
-                <p>Automatically captures marketing campaign parameters:</p>
-                <ul>
-                  <li><code className="inline-code">utm_source</code> - Traffic source</li>
-                  <li><code className="inline-code">utm_medium</code> - Marketing medium</li>
-                  <li><code className="inline-code">utm_campaign</code> - Campaign name</li>
-                </ul>
-              </div>
-            </section>
-
-            {/* Custom Events */}
-            <section id="custom-events">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={WrenchIcon} />
-                </div>
-                6. Custom Event Tracking
-              </h2>
-              
-              <p>
-                Track specific user interactions using the dashboard or JavaScript API.
-              </p>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={SettingsIcon} />
-                  </div>
-                  Method 1: Dashboard (No-Code)
-                </h3>
-                <p>
-                  Configure tracking rules without touching code:
-                </p>
-                <ol>
-                  <li>Go to <strong>Custom Events</strong> in the dashboard</li>
-                  <li>Click <strong>"Add Custom Event"</strong></li>
-                  <li>Enter a name (e.g., "newsletter_signup")</li>
-                  <li>Enter a CSS selector (e.g., <code className="inline-code">#newsletter-form</code>)</li>
-                  <li>Choose the trigger type (click, submit, change)</li>
-                  <li>Save the rule</li>
-                </ol>
-                <div className="info-box">
-                  <strong>Pro Tip:</strong> Use browser DevTools (right-click → Inspect) to find CSS selectors.
-                </div>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CodeIcon} />
-                  </div>
-                  Method 2: Data Attributes
-                </h3>
-                <p>
-                  Add data attributes to any HTML element:
-                </p>
-                <div className="code-block">
-                  <span className="comment">{'<!-- Track button clicks -->'}</span>{'\n'}
-                  <span className="keyword">{'<button'}</span> <span className="property">data-pixel-event</span>=<span className="string">"signup_click"</span><span className="keyword">{'>'}</span>{'\n'}
-                  {'  Sign Up'}{'\n'}
-                  <span className="keyword">{'</button>'}</span>
-                </div>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CodeIcon} />
-                  </div>
-                  Method 3: JavaScript API
-                </h3>
-                <div className="code-block">
-                  <span className="comment">// Track custom event</span>{'\n'}
-                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'newsletter_signup'</span>, {'{\n'}
-                  {'  '}<span className="property">email</span>: <span className="string">'user@example.com'</span>{'\n'}
-                  {'}'});
-                </div>
-              </div>
-            </section>
-
-            {/* E-commerce Tracking */}
-            <section id="ecommerce">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={CartIcon} />
-                </div>
-                7. E-commerce Tracking
-              </h2>
-              
-              <p>
-                Pixel Tracker provides built-in e-commerce tracking methods:
-              </p>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ViewIcon} />
-                  </div>
-                  Track Product View
-                </h3>
-                <div className="code-block">
-                  <span className="function">PixelAnalytics</span>.<span className="function">trackViewContent</span>({'\n'}
-                  {'  '}<span className="string">'SKU-12345'</span>,      <span className="comment">// Product ID</span>{'\n'}
-                  {'  '}<span className="string">'Blue T-Shirt'</span>,   <span className="comment">// Product Name</span>{'\n'}
-                  {'  '}<span className="number">29.99</span>,            <span className="comment">// Price</span>{'\n'}
-                  {'  '}<span className="string">'Apparel'</span>         <span className="comment">// Category</span>{'\n'}
-                  {');'}
-                </div>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CartIcon} />
-                  </div>
-                  Track Add to Cart
-                </h3>
-                <div className="code-block">
-                  <span className="function">PixelAnalytics</span>.<span className="function">trackAddToCart</span>({'\n'}
-                  {'  '}<span className="string">'SKU-12345'</span>,      <span className="comment">// Product ID</span>{'\n'}
-                  {'  '}<span className="string">'Blue T-Shirt'</span>,   <span className="comment">// Product Name</span>{'\n'}
-                  {'  '}<span className="number">29.99</span>,            <span className="comment">// Price</span>{'\n'}
-                  {'  '}<span className="number">1</span>                 <span className="comment">// Quantity</span>{'\n'}
-                  {');'}
-                </div>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CheckCircleIcon} />
-                  </div>
-                  Track Purchase
-                </h3>
-                <div className="code-block">
-                  <span className="function">PixelAnalytics</span>.<span className="function">trackPurchase</span>({'\n'}
-                  {'  '}<span className="number">59.98</span>,            <span className="comment">// Total Value</span>{'\n'}
-                  {'  '}<span className="string">'USD'</span>,            <span className="comment">// Currency</span>{'\n'}
-                  {'  '}<span className="string">'ORDER-123'</span>,      <span className="comment">// Order ID</span>{'\n'}
-                  {'  '}[...]                 <span className="comment">// Products array</span>{'\n'}
-                  {');'}
-                </div>
-                <div className="info-box">
-                  <strong>Server-Side Purchase Tracking:</strong> Purchases are also tracked automatically 
-                  via Shopify webhooks, ensuring 100% capture even if the customer closes the browser.
-                </div>
-              </div>
-            </section>
-
-            {/* JavaScript API */}
-            <section id="javascript-api">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={CodeIcon} />
-                </div>
-                8. JavaScript API Reference
-              </h2>
-              
-              <p>
-                The <code className="inline-code">PixelAnalytics</code> object is available globally after the script loads.
-              </p>
-
-              <div className="docs-section">
-                <h3>Methods</h3>
-                <table className="event-table">
-                  <thead>
-                    <tr>
-                      <th>Method</th>
-                      <th>Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><code className="inline-code">track(eventName, props)</code></td>
-                      <td>Track a custom event</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">trackPurchase(value, currency, orderId, products)</code></td>
-                      <td>Track a purchase</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">trackAddToCart(productId, name, value, qty)</code></td>
-                      <td>Track add to cart</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">trackViewContent(productId, name, value, category)</code></td>
-                      <td>Track product view</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="docs-section">
-                <h3>Shorthand</h3>
-                <p>You can also use the shorthand <code className="inline-code">px()</code> function:</p>
-                <div className="code-block">
-                  <span className="comment">// These are equivalent:</span>{'\n'}
-                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'my_event'</span>);{'\n'}
-                  <span className="function">px</span>(<span className="string">'my_event'</span>);
-                </div>
-              </div>
-            </section>
-
-            {/* Settings */}
-            <section id="settings">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={SettingsIcon} />
-                </div>
-                9. Settings & Configuration
-              </h2>
-
-              <div className="docs-section">
-                <h3>Automatic Tracking Settings</h3>
-                <ul>
-                  <li><strong>Auto-track pageviews:</strong> Track page loads automatically</li>
-                  <li><strong>Auto-track clicks:</strong> Track link and button clicks</li>
-                  <li><strong>Auto-track scroll depth:</strong> Track scroll milestones</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>Privacy Settings</h3>
-                <ul>
-                  <li><strong>Record IP addresses:</strong> Store visitor IPs for geo-location</li>
-                  <li><strong>Record location data:</strong> Store city/country information</li>
-                  <li><strong>Record session data:</strong> Track sessions across pages</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>Meta Integration Settings</h3>
-                <ul>
-                  <li><strong>Enable Meta Pixel forwarding:</strong> Send events to Facebook</li>
-                  <li><strong>Meta Pixel ID:</strong> Your 16-digit pixel ID</li>
-                  <li><strong>Access Token:</strong> For Conversions API (optional)</li>
-                  <li><strong>Test Event Code:</strong> For testing in Events Manager</li>
-                </ul>
-              </div>
-            </section>
-
-            {/* Troubleshooting */}
-            <section id="troubleshooting">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={WrenchIcon} />
-                </div>
-                10. Troubleshooting
-              </h2>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={AlertTriangleIcon} />
-                  </div>
-                  No events showing in dashboard
-                </h3>
-                <ol>
-                  <li><strong>Check App Embed is enabled:</strong> Online Store → Themes → Customize → App embeds → Pixel Tracker ON</li>
-                  <li><strong>Check console for errors:</strong> Open DevTools (F12) → Console</li>
-                  <li><strong>Look for [PixelTracker] messages:</strong> You should see "Starting for shop..." and "Track response: 200"</li>
-                  <li><strong>Verify pixel exists:</strong> Go to Facebook Pixels in the app and ensure you have at least one pixel created</li>
-                </ol>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={AlertTriangleIcon} />
-                  </div>
-                  "Config data: error" in console
-                </h3>
-                <p>This means the pixel configuration couldn't be loaded:</p>
-                <ol>
-                  <li>Ensure you have created at least one pixel in the app</li>
-                  <li>Check that your app is properly installed</li>
-                  <li>Try reinstalling the app if the issue persists</li>
-                </ol>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={AlertTriangleIcon} />
-                  </div>
-                  CORB or CORS errors
-                </h3>
-                <p>If you see Cross-Origin errors:</p>
-                <ol>
-                  <li>Go to <strong>Settings</strong> in the app</li>
-                  <li>Click <strong>"Delete Old Script Tags"</strong></li>
-                  <li>This removes any legacy script tags that may conflict</li>
-                  <li>Ensure you're using the App Embed method (not manual script tags)</li>
-                </ol>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CodeIcon} />
-                  </div>
-                  Debug Mode
-                </h3>
-                <p>The tracking script has debug mode enabled by default. Check your browser console for detailed logs:</p>
-                <ul>
-                  <li><code className="inline-code">[PixelTracker] Starting for shop:</code> - Script initialized</li>
-                  <li><code className="inline-code">[PixelTracker] Config response: 200</code> - Config loaded successfully</li>
-                  <li><code className="inline-code">[PixelTracker] pageview {'{...}'}</code> - Event being sent</li>
-                  <li><code className="inline-code">[PixelTracker] Track response: 200</code> - Event saved successfully</li>
-                </ul>
-              </div>
-            </section>
-
-            {/* FAQ */}
-            <section id="faq">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={QuestionCircleIcon} />
-                </div>
-                11. Frequently Asked Questions
-              </h2>
-
-              <div className="docs-section">
-                <h3>Do I need to edit my theme code?</h3>
-                <p>
-                  <strong>No!</strong> Just enable the App Embed in your theme editor. No code editing required.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3>Will ad blockers affect tracking?</h3>
-                <p>
-                  <strong>No.</strong> Because tracking goes through your store's domain via Shopify App Proxy, 
-                  ad blockers cannot distinguish it from normal store requests.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3>Is purchase tracking automatic?</h3>
-                <p>
-                  <strong>Yes.</strong> Purchases are tracked via Shopify webhooks (server-side), ensuring 
-                  100% capture even if the customer closes their browser after payment.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3>Can I track multiple stores?</h3>
-                <p>
-                  Each store installation is independent. Install the app on each store you want to track.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3>Is the data GDPR compliant?</h3>
-                <p>
-                  Yes. You can disable IP recording and location tracking in Settings. 
-                  All data sent to Meta is hashed using SHA-256.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3>Why is my store password protected?</h3>
-                <p>
-                  Shopify requires a paid plan to remove password protection. You can still test 
-                  tracking by entering the password and checking the console for [PixelTracker] messages.
-                </p>
-              </div>
-            </section>
-
-            {/* Contact */}
-            <section>
-              <h2>
-                <div className="section-icon">
-                  <Icon source={EmailIcon} />
-                </div>
-                Need Help?
-              </h2>
-              
-              <div className="docs-section" style={{ borderLeftColor: "#22c55e" }}>
-                <InlineStack gap="300" align="start">
-                  <div className="icon-wrapper" style={{ background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)" }}>
-                    <Icon source={EmailIcon} />
-                  </div>
-              <BlockStack gap="200">
-                    <h3 style={{ marginTop: 0 }}>Contact Support</h3>
-                    <p><strong>Warewe Consultancy Private Limited</strong></p>
-                    <p>
-                      Email: <Link url="mailto:support@warewe.online">support@warewe.online</Link>
-                    </p>
-                    <p>
-                      Website: <Link url="https://pixelify.warewe.online" external>pixelify.warewe.online</Link>
-                    </p>
-              </BlockStack>
-                </InlineStack>
-              </div>
-            </section>
-
-            <div className="footer-note">
-              <div style={{ width: "32px", height: "32px", margin: "0 auto 1rem", color: "#5c6ac4" }}>
-                <Icon source={BookOpenIcon} />
-              </div>
-              <p style={{ fontSize: "1rem", fontWeight: "500" }}>
-                Documentation last updated: December 2024
-              </p>
-              <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
-                <Link url="/privacy-policy">Privacy Policy</Link>
-              </p>
+            <div className="table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Data Type</th>
+                    <th>Description</th>
+                    <th>Configurable</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Page URL</strong></td><td>Full URL visited</td><td>Always on</td></tr>
+                  <tr><td><strong>Referrer</strong></td><td>Traffic source</td><td>Always on</td></tr>
+                  <tr><td><strong>Device Info</strong></td><td>Browser, OS, screen</td><td>Always on</td></tr>
+                  <tr><td><strong>IP Address</strong></td><td>For geo-location</td><td>Can disable</td></tr>
+                  <tr><td><strong>Location</strong></td><td>City, country</td><td>Can disable</td></tr>
+                  <tr><td><strong>Session ID</strong></td><td>Session tracking</td><td>Can disable</td></tr>
+                  <tr><td><strong>UTM Params</strong></td><td>Campaign data</td><td>Always on</td></tr>
+                </tbody>
+              </table>
             </div>
-            </BlockStack>
+          </section>
+
+          {/* Dashboard */}
+          <section id="dashboard" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={ChartLineIcon} />
+              </div>
+              <h2>Dashboard Overview</h2>
+            </div>
+
+            <div className="card">
+              <h3><Icon source={ChartLineIcon} /> Main Dashboard</h3>
+              <ul>
+                <li><strong>Total Events:</strong> All tracked events</li>
+                <li><strong>Unique Visitors:</strong> Distinct visitors</li>
+                <li><strong>Page Views:</strong> Total pageviews</li>
+                <li><strong>Sessions:</strong> Browsing sessions</li>
+                <li><strong>Active Now:</strong> Real-time visitors (last 5 min)</li>
+              </ul>
+            </div>
+
+            <div className="card">
+              <h3><Icon source={ViewIcon} /> Analytics Page</h3>
+              <ul>
+                <li><strong>Traffic Sources:</strong> Where visitors come from</li>
+                <li><strong>Device Breakdown:</strong> Desktop / Mobile / Tablet</li>
+                <li><strong>Browser Stats:</strong> Chrome, Safari, Firefox...</li>
+                <li><strong>Geographic Data:</strong> Countries, cities</li>
+                <li><strong>Top Events & Pages:</strong> Most popular content</li>
+              </ul>
+            </div>
+
+            <div className="card">
+              <h3><Icon source={PersonIcon} /> Visitors Page</h3>
+              <ul>
+                <li><strong>Visitor List:</strong> All tracked visitors</li>
+                <li><strong>Session Details:</strong> Pages viewed, time on site</li>
+                <li><strong>Device Info:</strong> Browser, OS, screen size</li>
+                <li><strong>Location:</strong> Country and city</li>
+              </ul>
+            </div>
+          </section>
+
+          {/* Meta Pixel */}
+          <section id="meta-pixel" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={TargetIcon} />
+              </div>
+              <h2>Meta Pixel Integration</h2>
+            </div>
+
+            <div className="card">
+              <h3>Setup Steps</h3>
+              <ol>
+                <li>Go to <Link url="https://business.facebook.com/events_manager" external>Meta Events Manager</Link></li>
+                <li>Copy your <strong>Pixel ID</strong> (16 digits)</li>
+                <li>In Pixel Tracker → <strong>Settings</strong></li>
+                <li>Enable <strong>Meta Pixel Integration</strong></li>
+                <li>Enter your Pixel ID</li>
+                <li>Optionally add <strong>Conversions API Access Token</strong></li>
+              </ol>
+            </div>
+
+            <div className="table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Event</th>
+                    <th>Trigger</th>
+                    <th>Data</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>PageView</strong></td><td>Every page load</td><td>URL, title</td></tr>
+                  <tr><td><strong>ViewContent</strong></td><td>Product page</td><td>Product ID, price</td></tr>
+                  <tr><td><strong>AddToCart</strong></td><td>Add to cart</td><td>Product, quantity</td></tr>
+                  <tr><td><strong>Purchase</strong></td><td>Order complete</td><td>Order ID, value</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="alert alert-warning">
+              <div className="alert-icon">
+                <Icon source={AlertTriangleIcon} />
+              </div>
+              <div className="alert-content">
+                <strong>Keep it Secret</strong>
+                <p>Never share your Conversions API access token publicly.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Auto Tracking */}
+          <section id="auto-tracking" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={ViewIcon} />
+              </div>
+              <h2>Automatic Tracking</h2>
+            </div>
+            
+            <p className="section-intro">Configure automatic tracking in Settings.</p>
+
+            <div className="card">
+              <h3>📄 Page Views (Default: ON)</h3>
+              <p>Captured on every page load with URL, title, referrer, and UTM parameters.</p>
+            </div>
+
+            <div className="card">
+              <h3>👆 Click Tracking (Default: ON)</h3>
+              <p>Tracks clicks on links, buttons, and interactive elements with element info.</p>
+            </div>
+
+            <div className="card">
+              <h3>📜 Scroll Depth (Default: OFF)</h3>
+              <p>Tracks scroll milestones at 25%, 50%, 75%, and 100%.</p>
+            </div>
+          </section>
+
+          {/* Custom Events */}
+          <section id="custom-events" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={WrenchIcon} />
+              </div>
+              <h2>Custom Events</h2>
+            </div>
+
+            <div className="card">
+              <h3>Method 1: Dashboard (No-Code)</h3>
+              <ol>
+                <li>Go to <strong>Custom Events</strong></li>
+                <li>Click <strong>"Add Custom Event"</strong></li>
+                <li>Enter name and CSS selector</li>
+                <li>Choose trigger type (click, submit, change)</li>
+                <li>Save</li>
+              </ol>
+            </div>
+
+            <div className="card">
+              <h3>Method 2: Data Attributes</h3>
+              <div className="code-block">
+                <span className="keyword">{'<button'}</span> <span className="property">data-pixel-event</span>=<span className="string">"signup_click"</span><span className="keyword">{'>'}</span>{'\n'}
+                {'  Sign Up'}{'\n'}
+                <span className="keyword">{'</button>'}</span>
+              </div>
+            </div>
+
+            <div className="card">
+              <h3>Method 3: JavaScript API</h3>
+              <div className="code-block">
+                <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'newsletter_signup'</span>, {'{\n'}
+                {'  '}<span className="property">email</span>: <span className="string">'user@example.com'</span>{'\n'}
+                {'}'});
+              </div>
+            </div>
+          </section>
+
+          {/* E-commerce */}
+          <section id="ecommerce" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={CartIcon} />
+              </div>
+              <h2>E-commerce Tracking</h2>
+            </div>
+
+            <div className="card">
+              <h3>Track Product View</h3>
+              <div className="code-block">
+                <span className="function">PixelAnalytics</span>.<span className="function">trackViewContent</span>({'\n'}
+                {'  '}<span className="string">'SKU-123'</span>,      <span className="comment">// Product ID</span>{'\n'}
+                {'  '}<span className="string">'Blue Shirt'</span>,   <span className="comment">// Name</span>{'\n'}
+                {'  '}<span className="number">29.99</span>,          <span className="comment">// Price</span>{'\n'}
+                {'  '}<span className="string">'Apparel'</span>       <span className="comment">// Category</span>{'\n'}
+                {');'}
+              </div>
+            </div>
+
+            <div className="card">
+              <h3>Track Add to Cart</h3>
+              <div className="code-block">
+                <span className="function">PixelAnalytics</span>.<span className="function">trackAddToCart</span>({'\n'}
+                {'  '}<span className="string">'SKU-123'</span>,      <span className="comment">// Product ID</span>{'\n'}
+                {'  '}<span className="string">'Blue Shirt'</span>,   <span className="comment">// Name</span>{'\n'}
+                {'  '}<span className="number">29.99</span>,          <span className="comment">// Price</span>{'\n'}
+                {'  '}<span className="number">1</span>               <span className="comment">// Quantity</span>{'\n'}
+                {');'}
+              </div>
+            </div>
+
+            <div className="card">
+              <h3>Track Purchase</h3>
+              <div className="code-block">
+                <span className="function">PixelAnalytics</span>.<span className="function">trackPurchase</span>({'\n'}
+                {'  '}<span className="number">59.98</span>,          <span className="comment">// Total</span>{'\n'}
+                {'  '}<span className="string">'USD'</span>,          <span className="comment">// Currency</span>{'\n'}
+                {'  '}<span className="string">'ORDER-123'</span>,    <span className="comment">// Order ID</span>{'\n'}
+                {'  '}[...]             <span className="comment">// Products</span>{'\n'}
+                {');'}
+              </div>
+            </div>
+
+            <div className="alert alert-info">
+              <div className="alert-icon">
+                <Icon source={CheckCircleIcon} />
+              </div>
+              <div className="alert-content">
+                <strong>Server-Side Purchase Tracking</strong>
+                <p>Purchases are also tracked via Shopify webhooks for 100% capture.</p>
+              </div>
+            </div>
+          </section>
+
+          {/* API */}
+          <section id="api" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={CodeIcon} />
+              </div>
+              <h2>JavaScript API</h2>
+            </div>
+
+            <div className="table-wrapper">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Method</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><code className="inline-code">track(event, props)</code></td><td>Track custom event</td></tr>
+                  <tr><td><code className="inline-code">trackPurchase(...)</code></td><td>Track purchase</td></tr>
+                  <tr><td><code className="inline-code">trackAddToCart(...)</code></td><td>Track add to cart</td></tr>
+                  <tr><td><code className="inline-code">trackViewContent(...)</code></td><td>Track product view</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div className="card">
+              <h3>Shorthand</h3>
+              <div className="code-block">
+                <span className="comment">// Both work the same:</span>{'\n'}
+                <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'my_event'</span>);{'\n'}
+                <span className="function">px</span>(<span className="string">'my_event'</span>);
+              </div>
+            </div>
+          </section>
+
+          {/* Settings */}
+          <section id="settings" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={SettingsIcon} />
+              </div>
+              <h2>Settings</h2>
+            </div>
+
+            <div className="card">
+              <h3>Automatic Tracking</h3>
+              <ul>
+                <li>Auto-track pageviews</li>
+                <li>Auto-track clicks</li>
+                <li>Auto-track scroll depth</li>
+              </ul>
+            </div>
+
+            <div className="card">
+              <h3>Privacy</h3>
+              <ul>
+                <li>Record IP addresses</li>
+                <li>Record location data</li>
+                <li>Record session data</li>
+              </ul>
+            </div>
+
+            <div className="card">
+              <h3>Meta Integration</h3>
+              <ul>
+                <li>Enable Meta Pixel forwarding</li>
+                <li>Meta Pixel ID</li>
+                <li>Access Token (optional)</li>
+                <li>Test Event Code</li>
+              </ul>
+            </div>
+          </section>
+
+          {/* Troubleshooting */}
+          <section id="troubleshooting" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={WrenchIcon} />
+              </div>
+              <h2>Troubleshooting</h2>
+            </div>
+
+            <div className="card">
+              <h3><Icon source={AlertTriangleIcon} /> No events in dashboard</h3>
+              <ol>
+                <li>Check App Embed is <strong>ON</strong> in theme editor</li>
+                <li>Open DevTools → Console → Look for <code className="inline-code">[PixelTracker]</code></li>
+                <li>Verify you have at least one pixel created</li>
+              </ol>
+            </div>
+
+            <div className="card">
+              <h3><Icon source={AlertTriangleIcon} /> CORS or CORB errors</h3>
+              <ol>
+                <li>Go to <strong>Settings</strong> in the app</li>
+                <li>Click <strong>"Delete Old Script Tags"</strong></li>
+                <li>Use App Embed method only (no manual scripts)</li>
+              </ol>
+            </div>
+
+            <div className="card">
+              <h3><Icon source={AlertTriangleIcon} /> Config error in console</h3>
+              <ol>
+                <li>Ensure you have created a pixel in the app</li>
+                <li>Check app is properly installed</li>
+                <li>Try reinstalling if issue persists</li>
+              </ol>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section id="faq" className="section">
+            <div className="section-header">
+              <div className="section-icon">
+                <Icon source={QuestionCircleIcon} />
+              </div>
+              <h2>FAQ</h2>
+            </div>
+
+            <div className="card">
+              <h3>Do I need to edit theme code?</h3>
+              <p><strong>No!</strong> Just enable the App Embed in theme editor.</p>
+            </div>
+
+            <div className="card">
+              <h3>Will ad blockers affect tracking?</h3>
+              <p><strong>No.</strong> Requests go through your store's domain, making them invisible to blockers.</p>
+            </div>
+
+            <div className="card">
+              <h3>Is purchase tracking automatic?</h3>
+              <p><strong>Yes.</strong> Purchases are tracked via Shopify webhooks for 100% capture.</p>
+            </div>
+
+            <div className="card">
+              <h3>Is it GDPR compliant?</h3>
+              <p><strong>Yes.</strong> You can disable IP/location tracking. Data sent to Meta is hashed.</p>
+            </div>
+          </section>
+
+          {/* Footer */}
+          <div className="footer">
+            <div className="footer-logo">
+              <Icon source={BookOpenIcon} />
+            </div>
+            <h3>Need Help?</h3>
+            <p><strong>Warewe Consultancy Private Limited</strong></p>
+            <p>Email: <a href="mailto:support@warewe.online">support@warewe.online</a></p>
+            <p>Website: <a href="https://pixelify.warewe.online" target="_blank" rel="noopener noreferrer">pixelify.warewe.online</a></p>
+            <div className="footer-divider"></div>
+            <p className="footer-bottom">
+              Documentation updated December 2024 · <a href="/privacy-policy">Privacy Policy</a>
+            </p>
+          </div>
         </div>
       </div>
     </Page>
