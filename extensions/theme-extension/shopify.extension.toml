@@ -1,18 +1,15 @@
 api_version = "2024-01"
 
 [[extensions]]
-
-uid = "a4d5f4f2-8223-6592-ef1c-8e921bb0d6ffdb66eb49"
-
 type = "theme"
 name = "Pixel Tracker"
 handle = "pixel-tracker"
 
+[extensions.capabilities]
+network_access = true
+
 [[extensions.blocks]]
 type = "pixel-tracker"
 name = "Pixel Tracker"
-target = "head"
-
-[extensions.capabilities]
-network_access = true
+target = "@app"
 

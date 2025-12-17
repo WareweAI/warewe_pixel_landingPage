@@ -1,8 +1,9 @@
 {% comment %}
-  Pixel Tracker - Theme App Extension
-  Injects tracking script into storefront head
+  Pixel Tracker - Theme App Extension (App Embed)
+  Injects tracking script into storefront
 {% endcomment %}
 
+{% if block.settings.enable_tracking %}
 <script>
 (function() {
   'use strict';
@@ -64,11 +65,22 @@
     });
 })();
 </script>
+{% endif %}
 
 {% schema %}
 {
   "name": "Pixel Tracker",
-  "target": "head",
-  "settings": []
+  "target": "body",
+  "enabled_on": {
+    "groups": ["*"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_tracking",
+      "label": "Enable Tracking",
+      "default": true
+    }
+  ]
 }
 {% endschema %}
