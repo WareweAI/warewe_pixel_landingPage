@@ -99,13 +99,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const metaTestEventCode = formData.get("metaTestEventCode") as string;
     const metaPixelEnabled = formData.get("metaPixelEnabled") === "true";
 
+    // Set metaVerified to true if both pixelId and accessToken are provided
+    const metaVerified = !!(metaPixelId && metaAccessToken && metaPixelEnabled);
+
     await prisma.appSettings.update({
       where: { appId },
       data: {
         metaPixelId: metaPixelId || null,
         metaAccessToken: metaAccessToken || null,
         metaTestEventCode: metaTestEventCode || null,
-        metaPixelEnabled
+        metaPixelEnabled,
+        metaVerified,
       },
     });
 
@@ -124,6 +128,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         metaAccessToken: null,
         metaTestEventCode: null,
         metaPixelEnabled: false,
+        metaVerified: false,
       },
     });
 

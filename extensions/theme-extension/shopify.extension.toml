@@ -1,6 +1,9 @@
 api_version = "2024-01"
 
 [[extensions]]
+
+uid = "a4d5f4f2-8223-6592-ef1c-8e921bb0d6ffdb66eb49"
+
 type = "theme"
 name = "Pixel Tracker"
 handle = "pixel-tracker"
