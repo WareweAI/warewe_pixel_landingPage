@@ -46,11 +46,13 @@ export default function DocsPage() {
   const { baseUrl } = useLoaderData<typeof loader>();
 
   return (
-    <Page fullWidth>
-      <div style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)",
-      }}>
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)",
+      margin: "-16px",
+      padding: "0",
+      width: "calc(100% + 32px)",
+    }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
           
@@ -92,14 +94,15 @@ export default function DocsPage() {
             margin-bottom: 24px;
           }
           .hero h1 {
-            font-size: 4rem;
+            font-size: 4.5rem;
             font-weight: 700;
             margin: 0 0 20px;
             background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #6366f1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -0.02em;
+            letter-spacing: 0.02em;
+            font-family: 'Space Grotesk', sans-serif;
           }
           .hero-subtitle {
             font-size: 1.25rem;
@@ -1007,6 +1010,6 @@ export default function DocsPage() {
           </div>
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
