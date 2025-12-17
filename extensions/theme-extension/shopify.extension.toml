@@ -1,0 +1,15 @@
+api_version = "2024-01"
+
+[[extensions]]
+
+uid = "6bda7c38-1903-56ee-3831-3cf227de25f31cf1963b"
+
+type = "theme"
+name = "Pixel Tracker"
+handle = "pixel-tracker-extension"
+
+[extensions.capabilities]
+block = true
+block_types = ["section", "app_embed"]
+network_access = true
+api_access = true

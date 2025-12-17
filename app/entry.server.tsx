@@ -27,6 +27,10 @@ export default async function handleRequest(
     // Shopify not configured - this is fine for landing page on Vercel
     console.log("Shopify headers not added - running in standalone mode");
   }
+
+  // Ensure proper headers for Shopify embedding
+  responseHeaders.delete("X-Frame-Options"); // Remove any existing X-Frame-Options
+  responseHeaders.set("Content-Security-Policy", "frame-ancestors https://*.myshopify.com https://admin.shopify.com;");
   const userAgent = request.headers.get("user-agent");
   const callbackName = isbot(userAgent ?? '')
     ? "onAllReady"
@@ -63,7 +67,6 @@ export default async function handleRequest(
     );
 
     // Automatically timeout the React renderer after 6 seconds, which ensures
-    // React has enough time to flush down the rejected boundary contents
     setTimeout(abort, streamTimeout + 1000);
   });
 }

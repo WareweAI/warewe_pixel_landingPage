@@ -52,12 +52,18 @@ export async function createAppWithSettings({
   metaAccessToken,
 }: CreateAppParams) {
   const appId = crypto.randomBytes(8).toString("hex");
+  
+  // Generate appToken - use dataset ID (metaAppId) if available, otherwise generate random
+  const appToken = metaAppId 
+    ? `token_${metaAppId}_${crypto.randomBytes(12).toString("hex")}`
+    : `token_${Date.now()}_${crypto.randomBytes(12).toString("hex")}`;
 
   const app = await prisma.app.create({
     data: {
       appId,
       name,
       userId,
+      appToken,
     },
   });
 

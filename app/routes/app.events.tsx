@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import { authenticate } from "../shopify.server";
+import { getShopifyInstance } from "../shopify.server";
 import prisma from "../db.server";
 import {
   Page,
@@ -19,7 +19,11 @@ import {
 } from "@shopify/polaris";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const shopify = getShopifyInstance();
+  if (!shopify?.authenticate) {
+    throw new Response("Shopify configuration not found", { status: 500 });
+  }
+  const { session } = await shopify.authenticate.admin(request);
   const shop = session.shop;
 
   const user = await prisma.user.findUnique({
@@ -155,7 +159,7 @@ export default function EventsPage() {
             <Card>
               <EmptyState
                 heading="No pixels yet"
-                action={{ content: "Create Pixel", url: "/app" }}
+                action={{ content: "Create Pixel", url: "/app/dashboard" }}
                 image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
               >
                 <p>Create a pixel to start tracking events.</p>

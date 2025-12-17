@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { useLoaderData, useFetcher } from "react-router";
-import { authenticate } from "../shopify.server";
+import { getShopifyInstance } from "../shopify.server";
 import prisma from "../db.server";
 import {
   Page,
@@ -21,10 +21,14 @@ import {
   Box,
   Divider,
 } from "@shopify/polaris";
-import { ClientOnly } from "~/components/ClientOnly";
+import { ClientOnly } from "../components/ClientOnly";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const shopify = getShopifyInstance();
+  if (!shopify?.authenticate) {
+    throw new Response("Shopify configuration not found", { status: 500 });
+  }
+  const { session } = await shopify.authenticate.admin(request);
   const shop = session.shop;
 
   const user = await prisma.user.findUnique({
@@ -46,7 +50,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { session, redirect } = await authenticate.admin(request);
+  const shopify = getShopifyInstance();
+  if (!shopify?.authenticate) {
+    throw new Response("Shopify configuration not found", { status: 500 });
+  }
+  const { session, redirect } = await shopify.authenticate.admin(request);
   const shop = session.shop;
   const formData = await request.formData();
   const intent = formData.get("intent") as string;
@@ -97,45 +105,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         metaPixelId: metaPixelId || null,
         metaAccessToken: metaAccessToken || null,
         metaTestEventCode: metaTestEventCode || null,
-        metaPixelEnabled,
-        metaVerified: false, // Reset verification on token change
+        metaPixelEnabled
       },
     });
 
     return { success: true, message: "Meta integration updated" };
   }
 
-  if (intent === "verify-meta") {
-    const appId = formData.get("appId") as string;
-    const metaPixelId = formData.get("metaPixelId") as string;
-    const metaAccessToken = formData.get("metaAccessToken") as string;
 
-    if (!metaPixelId || !metaAccessToken) {
-      return { error: "Meta Pixel ID and Access Token are required" };
-    }
-
-    try {
-      const response = await fetch("/api/meta/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ datasetId: metaPixelId, accessToken: metaAccessToken }),
-      });
-
-      const data = await response.json();
-
-      if (data.valid) {
-        await prisma.appSettings.update({
-          where: { appId },
-          data: { metaVerified: true },
-        });
-        return { success: true, message: "Meta credentials verified" };
-      } else {
-        return { error: data.error || "Invalid credentials" };
-      }
-    } catch {
-      return { error: "Failed to verify credentials" };
-    }
-  }
 
   if (intent === "disconnect-meta") {
     const appId = formData.get("appId") as string;
@@ -147,28 +124,62 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         metaAccessToken: null,
         metaTestEventCode: null,
         metaPixelEnabled: false,
-        metaVerified: false,
       },
     });
 
     return { success: true, message: "Meta integration disconnected" };
   }
 
-  if (intent === "delete-pixel") {
-    const appId = formData.get("appId") as string;
+  if (intent === "delete-script-tags") {
+    try {
+      // Get all script tags
+      const response = await fetch(`https://${session.shop}/admin/api/2024-10/script_tags.json`, {
+        method: "GET",
+        headers: {
+          "X-Shopify-Access-Token": session.accessToken,
+          "Content-Type": "application/json",
+        },
+      });
 
-    // Delete all related data
-    await prisma.customEvent.deleteMany({ where: { appId } });
-    await prisma.appSettings.deleteMany({ where: { appId } });
-    await prisma.event.deleteMany({ where: { appId } });
-    await prisma.analyticsSession.deleteMany({ where: { appId } });
-    await prisma.dailyStats.deleteMany({ where: { appId } });
-    await prisma.errorLog.deleteMany({ where: { appId } });
-    await prisma.app.delete({ where: { id: appId } });
+      if (!response.ok) {
+        return { error: "Failed to fetch script tags" };
+      }
 
-    // Use Shopify's redirect method for embedded app compatibility
-    return redirect("/app");
+      const data = await response.json();
+      const scriptTags = data.script_tags || [];
+      
+      // Find and delete script tags from our app (pixel-warewe)
+      let deletedCount = 0;
+      for (const tag of scriptTags) {
+        if (tag.src && tag.src.includes("pixel-warewe")) {
+          await fetch(`https://${session.shop}/admin/api/2024-10/script_tags/${tag.id}.json`, {
+            method: "DELETE",
+            headers: {
+              "X-Shopify-Access-Token": session.accessToken,
+            },
+          });
+          deletedCount++;
+        }
+      }
+
+      // Also delete from ScriptInjection table
+      await prisma.scriptInjection.deleteMany({
+        where: { shop: session.shop },
+      });
+
+      return { 
+        success: true, 
+        message: deletedCount > 0 
+          ? `Deleted ${deletedCount} old script tag(s). CORB errors should stop now.`
+          : "No old script tags found. Check if App Embed is enabled in Theme Editor."
+      };
+    } catch (error) {
+      console.error("Delete script tags error:", error);
+      return { error: "Failed to delete script tags" };
+    }
   }
+
+
 
   return { error: "Invalid intent" };
 };
@@ -177,7 +188,7 @@ export default function SettingsPage() {
   const { apps } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
   const [selectedAppId, setSelectedAppId] = useState(apps[0]?.id || "");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
 
   const selectedApp = apps.find((a: any) => a.id === selectedAppId);
@@ -267,17 +278,7 @@ export default function SettingsPage() {
     );
   }, [fetcher, selectedAppId, metaSettings]);
 
-  const handleVerifyMeta = useCallback(() => {
-    fetcher.submit(
-      {
-        intent: "verify-meta",
-        appId: selectedAppId,
-        metaPixelId: metaSettings.metaPixelId,
-        metaAccessToken: metaSettings.metaAccessToken,
-      },
-      { method: "POST" }
-    );
-  }, [fetcher, selectedAppId, metaSettings]);
+
 
   const handleDisconnectMeta = useCallback(() => {
     fetcher.submit(
@@ -287,13 +288,14 @@ export default function SettingsPage() {
     setShowDisconnectModal(false);
   }, [fetcher, selectedAppId]);
 
-  const handleDeletePixel = useCallback(() => {
+  const handleDeleteScriptTags = useCallback(() => {
     fetcher.submit(
-      { intent: "delete-pixel", appId: selectedAppId },
+      { intent: "delete-script-tags" },
       { method: "POST" }
     );
-    setShowDeleteModal(false);
-  }, [fetcher, selectedAppId]);
+  }, [fetcher]);
+
+
 
   const appOptions = apps.map((app: any) => ({
     label: app.name,
@@ -309,7 +311,7 @@ export default function SettingsPage() {
               <Card>
                 <EmptyState
                   heading="No pixels created"
-                  action={{ content: "Go to Dashboard", url: "/app" }}
+                  action={{ content: "Go to Dashboard", url: "/app/dashboard" }}
                   image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
                 >
                   <p>Create a pixel first to configure settings.</p>
@@ -347,6 +349,7 @@ export default function SettingsPage() {
             <Card>
               <BlockStack gap="400">
                 <Select
+                  id="select-pixel"
                   label="Select Pixel"
                   options={appOptions}
                   value={selectedAppId}
@@ -354,11 +357,9 @@ export default function SettingsPage() {
                 />
                 {selectedApp && (
                   <InlineStack gap="200">
-                    <Badge>ID: {selectedApp.appId}</Badge>
+                    <Badge>{`ID: ${selectedApp.appId}`}</Badge>
                     {settings?.metaPixelEnabled && (
-                      <Badge tone={settings.metaVerified ? "success" : "warning"}>
-                        Meta {settings.metaVerified ? "Verified" : "Not Verified"}
-                      </Badge>
+                      <Badge tone="success">Meta Connected</Badge>
                     )}
                   </InlineStack>
                 )}
@@ -452,13 +453,32 @@ export default function SettingsPage() {
             </Card>
           </Layout.Section>
 
+          {/* Delete Old Script Tags */}
+          <Layout.Section>
+            <Card>
+              <BlockStack gap="400">
+                <Text variant="headingMd" as="h2">🔧 Fix CORB Errors</Text>
+                <Banner tone="warning">
+                  <p>If you see CORB errors in browser console, old script tags may still be installed. Click below to remove them.</p>
+                </Banner>
+                <Text as="p" tone="subdued">
+                  The App Embed (Theme Editor → App embeds → Pixel Tracker) replaces the old script tags. 
+                  This will delete any old script tags causing CORB errors.
+                </Text>
+                <Button onClick={handleDeleteScriptTags} loading={isLoading} tone="critical">
+                  Delete Old Script Tags
+                </Button>
+              </BlockStack>
+            </Card>
+          </Layout.Section>
+
           {/* Meta Integration */}
           <Layout.Section>
             <Card>
               <BlockStack gap="400">
                 <InlineStack align="space-between">
                   <Text variant="headingMd" as="h2">Meta Pixel Integration</Text>
-                  {settings?.metaVerified && (
+                  {settings?.metaPixelEnabled && (
                     <Badge tone="success">Connected</Badge>
                   )}
                 </InlineStack>
@@ -477,6 +497,7 @@ export default function SettingsPage() {
                 />
 
                 <TextField
+                  id="meta-pixel-id"
                   label="Meta Pixel ID"
                   value={metaSettings.metaPixelId}
                   onChange={(value) =>
@@ -499,6 +520,7 @@ export default function SettingsPage() {
                 />
 
                 <TextField
+                  id="meta-test-event-code"
                   label="Test Event Code (optional)"
                   value={metaSettings.metaTestEventCode}
                   onChange={(value) =>
@@ -513,9 +535,7 @@ export default function SettingsPage() {
                   <Button onClick={handleSaveMeta} loading={isLoading}>
                     Save Meta Settings
                   </Button>
-                  <Button onClick={handleVerifyMeta} loading={isLoading} disabled={!metaSettings.metaPixelId || !metaSettings.metaAccessToken}>
-                    Verify Credentials
-                  </Button>
+
                   {settings?.metaPixelEnabled && (
                     <Button tone="critical" onClick={() => setShowDisconnectModal(true)}>
                       Disconnect
@@ -526,26 +546,7 @@ export default function SettingsPage() {
             </Card>
           </Layout.Section>
 
-          {/* Danger Zone */}
-          <Layout.Section>
-            <Card>
-              <BlockStack gap="400">
-                <Text variant="headingMd" as="h2" tone="critical">Danger Zone</Text>
-                <Divider />
-                <InlineStack align="space-between" blockAlign="center">
-                  <BlockStack gap="100">
-                    <Text as="p" fontWeight="bold">Delete this pixel</Text>
-                    <Text as="p" tone="subdued">
-                      Permanently delete this pixel and all its data. This cannot be undone.
-                    </Text>
-                  </BlockStack>
-                  <Button tone="critical" onClick={() => setShowDeleteModal(true)}>
-                    Delete Pixel
-                  </Button>
-                </InlineStack>
-              </BlockStack>
-            </Card>
-          </Layout.Section>
+
         </Layout>
 
         {/* Disconnect Meta Modal */}
@@ -569,39 +570,7 @@ export default function SettingsPage() {
           </Modal.Section>
         </Modal>
 
-        {/* Delete Pixel Modal */}
-        <Modal
-          open={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          title="Delete Pixel"
-          primaryAction={{
-            content: "Delete Permanently",
-            onAction: handleDeletePixel,
-            destructive: true,
-          }}
-          secondaryActions={[
-            { content: "Cancel", onAction: () => setShowDeleteModal(false) },
-          ]}
-        >
-          <Modal.Section>
-            <BlockStack gap="400">
-              <Banner tone="critical">
-                <p>
-                  This will permanently delete the pixel "{selectedApp?.name}" and all associated data including:
-                </p>
-              </Banner>
-              <Box paddingInlineStart="400">
-                <BlockStack gap="100">
-                  <Text as="p">• All tracked events</Text>
-                  <Text as="p">• All analytics sessions</Text>
-                  <Text as="p">• All custom events</Text>
-                  <Text as="p">• All settings</Text>
-                </BlockStack>
-              </Box>
-              <Text as="p" fontWeight="bold">This action cannot be undone.</Text>
-            </BlockStack>
-          </Modal.Section>
-        </Modal>
+
       </Page>
     </ClientOnly>
   );

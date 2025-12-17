@@ -1,0 +1,40 @@
+{
+  "ratings": {
+    "stars": {
+      "label": "Rating"
+    },
+    "home": {
+      "recommendationText": "Highly Recommended!"
+    }
+  },
+  "pixel_tracker": {
+    "name": "Pixel Tracker",
+    "settings": {
+      "enabled": {
+        "label": "Enable Pixel Tracker"
+      },
+      "app_url": {
+        "label": "App URL",
+        "info": "The URL of your Pixel Tracker app"
+      },
+      "debug_mode": {
+        "label": "Debug Mode",
+        "info": "Show tracking events in browser console"
+      }
+    }
+  },
+  "custom_event_button": {
+    "name": "Custom Event Button",
+    "settings": {
+      "event_name": {
+        "label": "Event Name"
+      },
+      "button_text": {
+        "label": "Button Text"
+      },
+      "button_style": {
+        "label": "Button Style"
+      }
+    }
+  }
+}

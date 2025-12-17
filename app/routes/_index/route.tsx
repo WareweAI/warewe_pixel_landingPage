@@ -1,43 +1,54 @@
-import { redirect, type LoaderFunctionArgs } from "react-router";
-import { Form, useLoaderData } from "react-router";
+import type { LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
 import styles from "./style.module.css";
-import { loadEnv } from "../../lib/env-loader.server";
 
-// Loader
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // Load environment variables (server-only)
-  loadEnv();
   const url = new URL(request.url);
-
-  // If shop param exists → redirect to app
-  if (url.searchParams.get("shop")) {
-    throw redirect(`/app?${url.searchParams.toString()}`);
+  const hostname = url.hostname;
+  const shopDomain = request.headers.get("x-shopify-shop-domain");
+  const referer = request.headers.get("referer") || "";
+  const userAgent = request.headers.get("user-agent") || "";
+  
+  // Check for Shopify admin context indicators
+  const hasAppLoadId = url.searchParams.has("appLoadId");
+  const hasShopParam = url.searchParams.has("shop");
+  const hasShopifyShop = url.searchParams.has("shopify-shop");
+  const hasEmbedded = url.searchParams.has("embedded");
+  const hasHmac = url.searchParams.has("hmac");
+  const hasTimestamp = url.searchParams.has("timestamp");
+  const isFromShopifyAdmin = referer.includes("admin.shopify.com");
+  const isShopifyUserAgent = userAgent.includes("Shopify");
+  
+  // Check if this is an embedded app context (Shopify admin)
+  const isEmbeddedContext = 
+    hostname.includes("admin.shopify.com") ||
+    hostname.endsWith(".myshopify.com") ||
+    shopDomain ||
+    hasAppLoadId ||
+    hasShopParam ||
+    hasShopifyShop ||
+    hasEmbedded ||
+    hasHmac ||
+    hasTimestamp ||
+    isFromShopifyAdmin ||
+    isShopifyUserAgent ||
+    request.headers.get("sec-fetch-dest") === "iframe" ||
+    request.headers.get("x-shopify-api-request-failure-reauthorize") ||
+    request.headers.get("x-shopify-hmac-sha256");
+  
+  // If this is a Shopify admin context, redirect to /app dashboard
+  if (isEmbeddedContext) {
+    // Preserve any query parameters that might be needed for authentication
+    const searchParams = url.searchParams.toString();
+    const redirectUrl = searchParams ? `/app/dashboard?${searchParams}` : "/app/dashboard";
+    return redirect(redirectUrl);
   }
-
-  // Check for Shopify env keys
-  const hasShopifyKeys = Boolean(
-    process.env.SHOPIFY_API_KEY && process.env.SHOPIFY_API_SECRET
-  );
-
-  const appStoreUrl = process.env.SHOPIFY_APP_STORE_URL;
-
-  if (!hasShopifyKeys) {
-    console.warn(
-      "⚠️ SHOPIFY_API_KEY or SHOPIFY_API_SECRET missing in environment variables"
-    );
-  }
-
-  return {
-    showForm: true,
-    appStoreUrl,
-    hasShopifyKeys,
-  };
+  
+  // Otherwise show public landing page
+  return null;
 };
 
-// Component
 export default function App() {
-  const { showForm, appStoreUrl } = useLoaderData<typeof loader>();
-
   return (
     <div className={styles.container}>
       {/* Navbar */}
@@ -53,18 +64,23 @@ export default function App() {
             </div>
           </div>
 
-          {showForm && (
-            <Form method="post" action="/auth/login" className={styles.loginForm}>
-              <button className={styles.navButton} type="submit">
-                <img
-                  src="/assets/shopify.png"
-                  alt="Shopify"
-                  className={styles.shopifyIcon}
-                />
-                Get started
-              </button>
-            </Form>
-          )}
+          <a
+            href="/docs"
+            className={styles.navLink}
+          >
+            Documentation
+          </a>
+          <a
+            href="/auth/login"
+            className={styles.navButton}
+          >
+            <img
+              src="/assets/shopify.png"
+              alt="Shopify"
+              className={styles.shopifyIcon}
+            />
+            Install App
+          </a>
         </div>
       </nav>
 
@@ -94,30 +110,60 @@ export default function App() {
             </p>
           </div>
 
-          {showForm && (
-            <Form method="post" action="/auth/login" className={styles.ctaForm}>
-              <div className={styles.inputGroup}>
-                <input
-                  className={styles.input}
-                  type="text"
-                  name="shop"
-                  placeholder="your-store.myshopify.com"
-                  required
+          <div className={styles.ctaForm}>
+            <div className={styles.inputGroup}>
+              <input 
+                className={styles.input} 
+                type="text" 
+                id="shopDomain"
+                placeholder="your-store.myshopify.com"
+                required
+              />
+              <button 
+                className={styles.ctaButton} 
+                onClick={() => {
+                  const shopDomainElement = document.getElementById('shopDomain') as HTMLInputElement;
+                  let shopDomain = shopDomainElement?.value || '';
+                  
+                  if (shopDomain.trim()) {
+                    // Clean up the domain
+                    shopDomain = shopDomain.trim().toLowerCase();
+                    
+                    // Remove protocol if present
+                    shopDomain = shopDomain.replace(/^https?:\/\//, '');
+                    
+                    // Remove .myshopify.com if present, we'll add it back
+                    shopDomain = shopDomain.replace(/\.myshopify\.com.*$/, '');
+                    
+                    // Remove any trailing slashes or paths
+                    shopDomain = shopDomain.split('/')[0];
+                    
+                    // Validate domain format (basic check)
+                    if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(shopDomain) && shopDomain.length > 0) {
+                      alert('Please enter a valid Shopify store domain (e.g., your-store or your-store.myshopify.com)');
+                      return;
+                    }
+                    
+                    // Redirect to their specific store's app installation page
+                    const installUrl = `https://${shopDomain}.myshopify.com/admin/oauth/authorize?client_id=360b03eee304490f2fd1986a55ed0dd8&scope=read_analytics,read_customers,read_orders,read_products,read_checkouts,read_themes&redirect_uri=https://pixel-warewe.vercel.app/auth&state=${Date.now()}`;
+                    window.open(installUrl, '_blank');
+                  } else {
+                    alert('Please enter your Shopify store domain');
+                  }
+                }}
+              >
+                <img
+                  src="/assets/shopify.png"
+                  alt="Shopify"
+                  className={styles.shopifyIcon}
                 />
-                <button className={styles.ctaButton} type="submit">
-                  <img
-                    src="/assets/shopify.png"
-                    alt="Shopify"
-                    className={styles.shopifyIcon}
-                  />
-                  Install App
-                </button>
-              </div>
-              <p className={styles.inputHint}>
-                Enter your Shopify store domain to get started
-              </p>
-            </Form>
-          )}
+                Install App
+              </button>
+            </div>
+            <p className={styles.inputHint}>
+              Enter your Shopify store domain to get started in seconds
+            </p>
+          </div>
 
           <div className={styles.featureCards}>
             <div className={styles.featureCard}>

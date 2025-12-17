@@ -44,4 +44,3 @@ export class MetaApiError extends Error {
     this.code = code;
   }
 }
-

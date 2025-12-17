@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import { authenticate } from "../shopify.server";
+import { getShopifyInstance } from "../shopify.server";
 import prisma from "../db.server";
 import {
   Page,
@@ -20,7 +20,12 @@ import {
 // ClientOnly removed - Polaris components work with SSR
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const shopify = getShopifyInstance();
+  if (!shopify?.authenticate) {
+    throw new Response("Shopify configuration not found", { status: 500 });
+  }
+  
+  const { session } = await shopify.authenticate.admin(request);
   const shop = session.shop;
 
   const user = await prisma.user.findUnique({
@@ -121,7 +126,7 @@ export default function AnalyticsPage() {
             <Card>
               <EmptyState
                 heading="No pixels created"
-                action={{ content: "Go to Dashboard", url: "/app" }}
+                action={{ content: "Go to Dashboard", url: "/app/dashboard" }}
                 image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
               >
                 <p>Create a pixel first to view analytics.</p>

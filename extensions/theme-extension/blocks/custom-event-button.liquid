@@ -1,0 +1,120 @@
+{% comment %}
+Custom Event Button - Dynamically loads events from app database based on shop
+{% endcomment %}
+
+<div id="pixel-custom-events-embed" class="pixel-custom-events">
+  <div class="pixel-loading">Loading custom events...</div>
+</div>
+
+<script>
+(function() {
+  const shopDomain = "{{ shop.permanent_domain }}";
+  
+  fetch("https://pixel-warewe.vercel.app/api/get-pixel-id?shop=" + shopDomain)
+    .then(response => response.json())
+    .then(pixelData => {
+      if (!pixelData.success || !pixelData.appId) {
+        document.getElementById("pixel-custom-events-embed").innerHTML = 
+          '<p>Pixel not configured for this shop. Please install and configure the Pixel Tracker app.</p>';
+        return;
+      }
+
+      const appId = pixelData.appId;
+      
+      return fetch("https://pixel-warewe.vercel.app/api/custom-events?appId=" + appId + "&shop=" + shopDomain);
+    })
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById("pixel-custom-events-embed");
+      
+      if (!data.success || !data.events || data.events.length === 0) {
+        container.innerHTML = '<p>No custom events configured. Create them in your app dashboard.</p>';
+        return;
+      }
+
+      // Render buttons for each custom event
+      let buttonsHtml = '';
+      data.events.forEach(event => {
+        buttonsHtml += `
+          <button 
+            class="pixel-custom-btn" 
+            data-event-name="${event.name}"
+            data-event-data='${JSON.stringify(event.data || {})}'
+            style="
+              background-color: ${event.buttonColor || '#000000'};
+              color: ${event.textColor || '#ffffff'};
+              padding: 12px 24px;
+              margin: 5px;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+              font-size: 16px;
+              font-weight: bold;
+              transition: opacity 0.2s;
+            "
+            onmouseover="this.style.opacity='0.8'"
+            onmouseout="this.style.opacity='1'"
+          >
+            ${event.buttonText || event.displayName || event.name}
+          </button>
+        `;
+      });
+
+      container.innerHTML = buttonsHtml;
+
+      // Add click handlers
+      container.querySelectorAll('.pixel-custom-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const eventName = this.getAttribute('data-event-name');
+          const eventData = JSON.parse(this.getAttribute('data-event-data') || '{}');
+          
+          // Send to pixel tracker (if web pixel is loaded)
+          if (window.PixelTracker && window.PixelTracker.track) {
+            window.PixelTracker.track(eventName, eventData);
+          }
+          
+          // Send directly to backend
+          fetch("https://pixel-warewe.vercel.app/api/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              event: eventName,
+              data: eventData,
+              appId: data.appId,
+              shopDomain: shopDomain,
+              timestamp: new Date().toISOString(),
+              url: window.location.href,
+              source: 'theme_extension'
+            })
+          }).catch(err => console.error('Pixel tracking error:', err));
+          
+          console.log('Custom event triggered:', eventName, eventData);
+          
+          // Visual feedback
+          this.style.transform = 'scale(0.95)';
+          setTimeout(() => {
+            this.style.transform = 'scale(1)';
+          }, 150);
+        });
+      });
+    })
+    .catch(err => {
+      console.error('Error loading custom events:', err);
+      document.getElementById("pixel-custom-events-embed").innerHTML = 
+        '<p style="color: red;">Error loading custom events. Please check your connection.</p>';
+    });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Custom Event Buttons",
+  "target": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Custom events load automatically for this shop"
+    }
+  ]
+}
+{% endschema %}

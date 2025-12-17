@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { useLoaderData, useFetcher } from "react-router";
+import { useLoaderData, useFetcher, useSearchParams } from "react-router";
 import { authenticate } from "../shopify.server";
 import prisma from "../db.server";
-import crypto from "crypto";
+import { generateRandomPassword } from "~/lib/crypto.server";
 import { createAppWithSettings, renameApp, deleteAppWithData } from "~/services/app.service.server";
 import {
   Page,
@@ -23,13 +23,13 @@ import {
   Banner,
   FormLayout,
 } from "@shopify/polaris";
-import { ClientOnly } from "~/components/ClientOnly";
+import { ClientOnly } from "../components/ClientOnly";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (!authenticate) {
     throw new Response("Shopify configuration not found", { status: 500 });
   }
-  
+
   const { session, redirect } = await authenticate.admin(request);
   const shop = session.shop;
 
@@ -38,7 +38,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   });
 
   if (!user) {
-    const { generateRandomPassword } = await import("~/lib/crypto.server");
     user = await prisma.user.create({
       data: {
         email: shop,
@@ -62,11 +61,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const totalPixels = apps.length;
   const totalEvents = apps.reduce((sum, app) => sum + app._count.events, 0);
   const totalSessions = apps.reduce((sum, app) => sum + app._count.analyticsSessions, 0);
-  
+
   // Get recent events across all apps (last 7 days)
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  
+
   const recentEvents = await prisma.event.findMany({
     where: {
       app: {
@@ -86,7 +85,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   // Calculate today's stats
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const todayEvents = await prisma.event.count({
     where: {
       app: {
@@ -97,9 +96,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   });
 
   // Always show the dashboard at /app
-  return { 
-    shop, 
-    userId: user.id, 
+  return {
+    shop,
+    userId: user.id,
     apps,
     stats: {
       totalPixels,
@@ -122,7 +121,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (!authenticate) {
     throw new Response("Shopify configuration not found", { status: 500 });
   }
-  
+
   const { session } = await authenticate.admin(request);
   const shop = session.shop;
   const formData = await request.formData();
@@ -198,6 +197,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Index() {
   const { apps, stats, recentEvents } = useLoaderData<typeof loader>();
   const fetcher = useFetcher();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedApp, setSelectedApp] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState<any>(null);
@@ -211,6 +211,8 @@ export default function Index() {
     datasetId: "", // Dataset ID = App ID
     accessToken: "",
   });
+
+
   const [createError, setCreateError] = useState("");
   const [validating, setValidating] = useState(false);
   const [validated, setValidated] = useState(false);
@@ -221,9 +223,6 @@ export default function Index() {
 
   const isLoading = fetcher.state !== "idle";
 
-  // For embedded apps, we should redirect in the loader, not client-side
-  // This component will show the dashboard, but analytics is the default view
-  // The redirect happens in the loader if needed
 
   // Fetch analytics for selected app
   useEffect(() => {
@@ -254,7 +253,9 @@ export default function Index() {
     setCreateError("");
 
     try {
-      const response = await fetch("/api/meta/validate", {
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : "";
+      const response = await fetch(`${origin}/api/meta/validate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -262,6 +263,22 @@ export default function Index() {
           accessToken: createForm.accessToken,
         }),
       });
+
+      const contentType = response.headers.get("content-type") || "";
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(
+          `HTTP ${response.status}: ${text.slice(0, 200) || "Unknown error"}`
+        );
+      }
+
+      if (!contentType.includes("application/json")) {
+        const text = await response.text();
+        throw new Error(
+          `Non-JSON response: ${text.slice(0, 200) || "Empty response"}`
+        );
+      }
 
       const data = await response.json();
 
@@ -278,8 +295,9 @@ export default function Index() {
         setValidatedDatasetName("");
         setCreateError(data.error || "Invalid credentials. Please check your Dataset ID and Access Token.");
       }
-    } catch {
-      setCreateError("Failed to validate credentials");
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Network error occurred";
+      setCreateError(`Failed to validate credentials: ${errorMessage}`);
       setValidated(false);
     } finally {
       setValidating(false);
@@ -322,7 +340,7 @@ export default function Index() {
 
   const handleRename = useCallback(() => {
     if (!renameValue.trim()) return;
-    
+
     fetcher.submit(
       { intent: "rename", appId: showRenameModal.id, newName: renameValue },
       { method: "POST" }
@@ -356,7 +374,7 @@ export default function Index() {
 <script>
   window.PIXEL_APP_ID = "${showSnippet}";
 </script>
-<script async src="${origin}/api/pixel.js?id=${showSnippet}"></script>`);
+<script async src="${origin}/pixel.js?id=${showSnippet}"></script>`);
     }
   }, [showSnippet]);
 
@@ -381,47 +399,104 @@ export default function Index() {
       }
     >
       <Page
-        title="Dashboard"
+        title="Pixel Dashboard"
+        subtitle="Facebook Pixel & Conversion Tracking for Shopify"
         primaryAction={{
-          content: "Create Pixel",
+          content: "Add Facebook Pixel",
           onAction: () => setShowCreateModal(true),
         }}
       >
         <Layout>
+          {/* Quick Setup Guide */}
+          {apps.length === 0 && (
+            <Layout.Section>
+              <Card>
+                <BlockStack gap="400">
+                  <Text variant="headingLg" as="h2">
+                    🚀 Quick Setup Guide
+                  </Text>
+                  <Text as="p" tone="subdued">
+                    Get started with Facebook Pixel tracking in 3 simple steps:
+                  </Text>
+                  <InlineStack gap="400">
+                    <Card background="bg-surface-secondary">
+                      <BlockStack gap="200">
+                        <Text variant="headingSm" as="h3">1. Add Your Pixel</Text>
+                        <Text as="p" variant="bodySm" tone="subdued">
+                          Add your Facebook Pixel ID to start tracking
+                        </Text>
+                        <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+                          Add Facebook Pixel
+                        </Button>
+                      </BlockStack>
+                    </Card>
+                    <Card background="bg-surface-secondary">
+                      <BlockStack gap="200">
+                        <Text variant="headingSm" as="h3">2. Install Code</Text>
+                        <Text as="p" variant="bodySm" tone="subdued">
+                          Copy the tracking code to your theme
+                        </Text>
+                        <Button disabled>Get Install Code</Button>
+                      </BlockStack>
+                    </Card>
+                    <Card background="bg-surface-secondary">
+                      <BlockStack gap="200">
+                        <Text variant="headingSm" as="h3">3. Track Conversions</Text>
+                        <Text as="p" variant="bodySm" tone="subdued">
+                          Monitor your Facebook ad performance
+                        </Text>
+                        <Button disabled>View Analytics</Button>
+                      </BlockStack>
+                    </Card>
+                  </InlineStack>
+                </BlockStack>
+              </Card>
+            </Layout.Section>
+          )}
+
           {/* Dashboard Overview Stats */}
           <Layout.Section>
             <BlockStack gap="400">
               <Text variant="headingLg" as="h2">
-                Overview
+                Performance Overview
               </Text>
               <InlineStack gap="400" wrap={false}>
                 <Card>
                   <BlockStack gap="200">
                     <Text variant="bodySm" as="p" tone="subdued">
-                      Total Pixels
+                      Active Pixels
                     </Text>
                     <Text variant="headingXl" as="p">
                       {stats.totalPixels}
                     </Text>
+                    <Text variant="bodySm" as="p" tone="success">
+                      Facebook Pixels
+                    </Text>
                   </BlockStack>
                 </Card>
                 <Card>
                   <BlockStack gap="200">
                     <Text variant="bodySm" as="p" tone="subdued">
-                      Total Events
+                      Conversions Tracked
                     </Text>
                     <Text variant="headingXl" as="p">
                       {stats.totalEvents.toLocaleString()}
                     </Text>
+                    <Text variant="bodySm" as="p" tone="subdued">
+                      All time
+                    </Text>
                   </BlockStack>
                 </Card>
                 <Card>
                   <BlockStack gap="200">
                     <Text variant="bodySm" as="p" tone="subdued">
-                      Total Sessions
+                      Unique Visitors
                     </Text>
                     <Text variant="headingXl" as="p">
                       {stats.totalSessions.toLocaleString()}
+                    </Text>
+                    <Text variant="bodySm" as="p" tone="subdued">
+                      This month
                     </Text>
                   </BlockStack>
                 </Card>
@@ -432,6 +507,9 @@ export default function Index() {
                     </Text>
                     <Text variant="headingXl" as="p">
                       {stats.todayEvents.toLocaleString()}
+                    </Text>
+                    <Text variant="bodySm" as="p" tone="subdued">
+                      Live tracking
                     </Text>
                   </BlockStack>
                 </Card>
@@ -474,12 +552,17 @@ export default function Index() {
             </Layout.Section>
           )}
 
-          {/* Pixels List */}
+          {/* Facebook Pixels List */}
           <Layout.Section>
             <BlockStack gap="400">
-              <Text variant="headingLg" as="h2">
-                Your Pixels
-              </Text>
+              <InlineStack align="space-between" blockAlign="center">
+                <Text variant="headingLg" as="h2">
+                  Your Facebook Pixels
+                </Text>
+                <Button url="/app/pixels">
+                  Manage All Pixels
+                </Button>
+              </InlineStack>
               {apps.length === 0 ? (
                 <Card>
                   <EmptyState
@@ -504,7 +587,7 @@ export default function Index() {
                     renderItem={(app: any) => {
                       const { id, appId, name, _count, settings } = app;
                       return (
-                        <ResourceItem id={id} onClick={() => {}}>
+                        <ResourceItem id={id} onClick={() => { }}>
                           <BlockStack gap="300">
                             <InlineStack align="space-between" blockAlign="center">
                               <BlockStack gap="100">
@@ -522,11 +605,7 @@ export default function Index() {
                                 </Text>
                               </BlockStack>
                               <InlineStack gap="200">
-                                {settings?.metaPixelEnabled ? (
-                                  <Button variant="primary" url={`/app/analytics?appId=${appId}`}>
-                                    Go to Dashboard
-                                  </Button>
-                                ) : (
+                                {!settings?.metaPixelEnabled && (
                                   <Button variant="primary" onClick={() => setShowCreateModal(true)}>
                                     Connect Meta
                                   </Button>
@@ -569,103 +648,103 @@ export default function Index() {
 
           {/* Detailed Analytics for Selected Pixel */}
           {selectedApp && analytics && (
-                <Layout.Section>
-                  <BlockStack gap="400">
-                    <Text variant="headingLg" as="h2">
-                      Analytics Overview (Last 7 Days)
-                    </Text>
+            <Layout.Section>
+              <BlockStack gap="400">
+                <Text variant="headingLg" as="h2">
+                  Analytics Overview (Last 7 Days)
+                </Text>
 
-                    <InlineStack gap="400" wrap={false}>
-                      <Card>
-                        <BlockStack gap="200">
-                          <Text variant="bodySm" as="p" tone="subdued">
-                            Total Events
-                          </Text>
-                          <Text variant="headingLg" as="p">
-                            {analytics.overview?.totalEvents?.toLocaleString() || 0}
-                          </Text>
-                        </BlockStack>
-                      </Card>
-                      <Card>
-                        <BlockStack gap="200">
-                          <Text variant="bodySm" as="p" tone="subdued">
-                            Pageviews
-                          </Text>
-                          <Text variant="headingLg" as="p">
-                            {analytics.overview?.pageviews?.toLocaleString() || 0}
-                          </Text>
-                        </BlockStack>
-                      </Card>
-                      <Card>
-                        <BlockStack gap="200">
-                          <Text variant="bodySm" as="p" tone="subdued">
-                            Unique Visitors
-                          </Text>
-                          <Text variant="headingLg" as="p">
-                            {analytics.overview?.uniqueVisitors?.toLocaleString() || 0}
-                          </Text>
-                        </BlockStack>
-                      </Card>
-                      <Card>
-                        <BlockStack gap="200">
-                          <Text variant="bodySm" as="p" tone="subdued">
-                            Sessions
-                          </Text>
-                          <Text variant="headingLg" as="p">
-                            {analytics.overview?.sessions?.toLocaleString() || 0}
-                          </Text>
-                        </BlockStack>
-                      </Card>
-                    </InlineStack>
+                <InlineStack gap="400" wrap={false}>
+                  <Card>
+                    <BlockStack gap="200">
+                      <Text variant="bodySm" as="p" tone="subdued">
+                        Total Events
+                      </Text>
+                      <Text variant="headingLg" as="p">
+                        {analytics.overview?.totalEvents?.toLocaleString() || 0}
+                      </Text>
+                    </BlockStack>
+                  </Card>
+                  <Card>
+                    <BlockStack gap="200">
+                      <Text variant="bodySm" as="p" tone="subdued">
+                        Pageviews
+                      </Text>
+                      <Text variant="headingLg" as="p">
+                        {analytics.overview?.pageviews?.toLocaleString() || 0}
+                      </Text>
+                    </BlockStack>
+                  </Card>
+                  <Card>
+                    <BlockStack gap="200">
+                      <Text variant="bodySm" as="p" tone="subdued">
+                        Unique Visitors
+                      </Text>
+                      <Text variant="headingLg" as="p">
+                        {analytics.overview?.uniqueVisitors?.toLocaleString() || 0}
+                      </Text>
+                    </BlockStack>
+                  </Card>
+                  <Card>
+                    <BlockStack gap="200">
+                      <Text variant="bodySm" as="p" tone="subdued">
+                        Sessions
+                      </Text>
+                      <Text variant="headingLg" as="p">
+                        {analytics.overview?.sessions?.toLocaleString() || 0}
+                      </Text>
+                    </BlockStack>
+                  </Card>
+                </InlineStack>
 
-                    {analytics.topPages?.length > 0 && (
-                      <Card>
-                        <BlockStack gap="400">
-                          <Text variant="headingMd" as="h3">
-                            Top Pages
-                          </Text>
-                          <BlockStack gap="200">
-                            {analytics.topPages
-                              .slice(0, 5)
-                              .map((page: any, idx: number) => (
-                                <InlineStack key={idx} align="space-between">
-                                  <Text as="p">
-                                    {page.url ? new URL(page.url).pathname : "-"}
-                                  </Text>
-                                  <Text as="p" tone="subdued">
-                                    {page.count} views
-                                  </Text>
-                                </InlineStack>
-                              ))}
-                          </BlockStack>
-                        </BlockStack>
-                      </Card>
-                    )}
+                {analytics.topPages?.length > 0 && (
+                  <Card>
+                    <BlockStack gap="400">
+                      <Text variant="headingMd" as="h3">
+                        Top Pages
+                      </Text>
+                      <BlockStack gap="200">
+                        {analytics.topPages
+                          .slice(0, 5)
+                          .map((page: any, idx: number) => (
+                            <InlineStack key={idx} align="space-between">
+                              <Text as="p">
+                                {page.url ? new URL(page.url).pathname : "-"}
+                              </Text>
+                              <Text as="p" tone="subdued">
+                                {page.count} views
+                              </Text>
+                            </InlineStack>
+                          ))}
+                      </BlockStack>
+                    </BlockStack>
+                  </Card>
+                )}
 
-                    {analytics.topCountries?.length > 0 && (
-                      <Card>
-                        <BlockStack gap="400">
-                          <Text variant="headingMd" as="h3">
-                            Top Countries
-                          </Text>
-                          <BlockStack gap="200">
-                            {analytics.topCountries
-                              .slice(0, 5)
-                              .map((country: any, idx: number) => (
-                                <InlineStack key={idx} align="space-between">
-                                  <Text as="p">{country.country || "Unknown"}</Text>
-                                  <Text as="p" tone="subdued">
-                                    {country.count} visits
-                                  </Text>
-                                </InlineStack>
-                              ))}
-                          </BlockStack>
-                        </BlockStack>
-                      </Card>
-                    )}
-                  </BlockStack>
-                </Layout.Section>
-              )}
+                {analytics.topCountries?.length > 0 && (
+                  <Card>
+                    <BlockStack gap="400">
+                      <Text variant="headingMd" as="h3">
+                        Top Countries
+                      </Text>
+                      <BlockStack gap="200">
+                        {analytics.topCountries
+                          .slice(0, 5)
+                          .map((country: any, idx: number) => (
+                            <InlineStack key={idx} align="space-between">
+                              <Text as="p">{country.country || "Unknown"}</Text>
+                              <Text as="p" tone="subdued">
+                                {country.count} visits
+                              </Text>
+                            </InlineStack>
+                          ))}
+                      </BlockStack>
+                    </BlockStack>
+                  </Card>
+                )}
+              </BlockStack>
+            </Layout.Section>
+          )}
         </Layout>
 
         {/* Create Modal */}
@@ -706,6 +785,8 @@ export default function Index() {
                   </BlockStack>
                 </Banner>
               )}
+
+
 
               <FormLayout>
                 <TextField

@@ -7,93 +7,76 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-        
-model User { 
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  createdAt DateTime  @default(now())
 
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
   apps      App[]
 }
 
 model App {
-  id         String    @id @default(uuid())
-  appId      String    @unique          // public ID shown to users
-  appToken   String                     // secret token
-  name       String
-  createdAt  DateTime  @default(now())
-
-  userId     String
-  user       User      @relation(fields: [userId], references: [id])
-
-  events           Event[]
-  customEvents     CustomEvent[]
+  id                String             @id @default(uuid())
+  appId             String             @unique
+  appToken          String
+  name              String
+  createdAt         DateTime           @default(now())
+  userId            String
   analyticsSessions AnalyticsSession[]
-  errorLogs        ErrorLog[]
-  dailyStats       DailyStats[]
-  settings         AppSettings?
+  user              User               @relation(fields: [userId], references: [id])
+  settings          AppSettings?
+  customEvents      CustomEvent[]
+  dailyStats        DailyStats[]
+  errorLogs         ErrorLog[]
+  events            Event[]
 }
 
 model Event {
-  id          String    @id @default(uuid())
-
-  appId       String
-  app         App       @relation(fields: [appId], references: [id])
-
-  eventName   String
-  url         String?
-  referrer    String?
-  userAgent   String?
-  ipAddress   String?
-
-  // Geo data (from IP-API)
-  country     String?
-  countryCode String?
-  region      String?
-  city        String?
-  zip         String?
-  lat         Float?
-  lon         Float?
-  timezone    String?
-  isp         String?
-
-  // Device data (from ua-parser-js)
+  id             String   @id @default(uuid())
+  appId          String
+  eventName      String
+  url            String?
+  referrer       String?
+  userAgent      String?
+  ipAddress      String?
+  country        String?
+  countryCode    String?
+  region         String?
+  city           String?
+  zip            String?
+  lat            Float?
+  lon            Float?
+  timezone       String?
+  isp            String?
   browser        String?
   browserVersion String?
   os             String?
   osVersion      String?
   device         String?
-  deviceType     String?   // desktop, mobile, tablet
+  deviceType     String?
   deviceVendor   String?
-
-  fingerprint String?
-  sessionId   String?
-
-  // UTM Params
-  utmSource   String?
-  utmMedium   String?
-  utmCampaign String?
-  utmTerm     String?
-  utmContent  String?
-
-  // Page data
-  pageTitle   String?
-  screenWidth  Int?
-  screenHeight Int?
-  scrollDepth Int?
-  clickX      Int?
-  clickY      Int?
-
-  // E-commerce
-  value       Float?
-  currency    String?
-  productId   String?
-  productName String?
-  quantity    Int?
-
-  customData  Json?
-  createdAt   DateTime  @default(now())
+  fingerprint    String?
+  sessionId      String?
+  utmSource      String?
+  utmMedium      String?
+  utmCampaign    String?
+  utmTerm        String?
+  utmContent     String?
+  pageTitle      String?
+  screenWidth    Int?
+  screenHeight   Int?
+  scrollDepth    Int?
+  clickX         Int?
+  clickY         Int?
+  value          Float?
+  currency       String?
+  productId      String?
+  productName    String?
+  quantity       Int?
+  customData     Json?
+  createdAt      DateTime @default(now())
+  app            App      @relation(fields: [appId], references: [id])
 
   @@index([appId, createdAt])
   @@index([eventName])
@@ -102,106 +85,101 @@ model Event {
 }
 
 model CustomEvent {
-  id            String    @id @default(uuid())
+  id            String   @id @default(uuid())
   appId         String
-  app           App        @relation(fields: [appId], references: [id], onDelete: Cascade)
-  
-  // Event identification
-  name          String                    // Internal name (e.g., "add_to_cart")
-  displayName   String                    // User-friendly name (e.g., "Add to Cart")
-  description   String?                   // Description of what this event tracks
-  
-  // Automatic DOM tracking (optional)
-  selector      String?                   // CSS selector for auto-tracking (e.g., "#buy-btn")
-  eventType     String    @default("click") // DOM event type: click, submit, focus, change
-  
-  // Meta Pixel integration
-  metaEventName String?                   // Map to Meta standard events (e.g., "AddToCart")
-  
-  // Event data configuration
-  hasProductId  Boolean   @default(false) // Track product ID
-  
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
+  name          String
+  displayName   String
+  description   String?
+  metaEventName String?
+  hasProductId  Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  eventType     String   @default("click")
+  selector      String?
+  buttonText    String?
+  buttonColor   String?  @default("#000000")
+  textColor     String?  @default("#ffffff")
+  eventData     String?
+  app           App      @relation(fields: [appId], references: [id], onDelete: Cascade)
 
-  @@index([appId])
   @@unique([appId, name])
+  @@index([appId])
 }
 
 model DailyStats {
-  id          String    @id @default(uuid())
-
+  id          String   @id @default(uuid())
   appId       String
-  app         App       @relation(fields: [appId], references: [id])
-
   date        DateTime
-
-  pageviews   Int       @default(0)
-  uniqueUsers Int       @default(0)
-  sessions    Int       @default(0)
-  purchases   Int       @default(0)
-  revenue     Float     @default(0)
-
-  updatedAt   DateTime  @default(now())
+  pageviews   Int      @default(0)
+  uniqueUsers Int      @default(0)
+  sessions    Int      @default(0)
+  purchases   Int      @default(0)
+  revenue     Float    @default(0)
+  updatedAt   DateTime @default(now())
+  app         App      @relation(fields: [appId], references: [id])
 
   @@unique([appId, date])
 }
 
 model AnalyticsSession {
-  id          String    @id @default(uuid())
-
+  id          String   @id @default(uuid())
   appId       String
-  app         App       @relation(fields: [appId], references: [id])
-
-  sessionId   String    @unique
+  sessionId   String   @unique
   fingerprint String?
   ipAddress   String?
   userAgent   String?
-
-  // Device info
   browser     String?
   os          String?
   deviceType  String?
   country     String?
-
-  pageviews   Int       @default(0)
-  duration    Int       @default(0)  // in seconds
-
-  startTime   DateTime  @default(now())
-  lastSeen    DateTime  @default(now())
+  pageviews   Int      @default(0)
+  duration    Int      @default(0)
+  startTime   DateTime @default(now())
+  lastSeen    DateTime @default(now())
+  app         App      @relation(fields: [appId], references: [id])
 
   @@index([appId, startTime])
 }
 
 model ErrorLog {
-  id        String    @id @default(uuid())
-
+  id        String   @id @default(uuid())
   appId     String
-  app       App       @relation(fields: [appId], references: [id])
-
   message   String?
   stack     String?
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
+  app       App      @relation(fields: [appId], references: [id])
 }
 
 model AppSettings {
-  id                 String    @id @default(uuid())
-
-  appId              String    @unique
-  app                App       @relation(fields: [appId], references: [id])
-
-  autoTrackPageviews Boolean   @default(true)
-  autoTrackClicks    Boolean   @default(true)
-  autoTrackScroll    Boolean   @default(true)
-  recordIp           Boolean   @default(true)
-  recordLocation     Boolean   @default(true)
-  recordSession      Boolean   @default(true)
-  
+  id                 String  @id @default(uuid())
+  appId              String  @unique
+  autoTrackPageviews Boolean @default(true)
+  autoTrackClicks    Boolean @default(true)
+  autoTrackScroll    Boolean @default(true)
+  recordIp           Boolean @default(true)
+  recordLocation     Boolean @default(true)
+  recordSession      Boolean @default(true)
   metaPixelId        String?
   metaAccessToken    String?
-  metaPixelEnabled   Boolean   @default(false)
+  metaPixelEnabled   Boolean @default(false)
   metaTestEventCode  String?
-  metaVerified       Boolean   @default(false)
+  metaVerified       Boolean @default(false)
+  app                App     @relation(fields: [appId], references: [id])
+}
+
+model ScriptInjection {
+  id          String   @id @default(uuid())
+  appId       String
+  shop        String
+  scriptTagId String?
+  scriptUrl   String
+  enabled     Boolean  @default(true)
+  config      Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([appId, shop])
+  @@index([shop])
 }
 
 model Session {
@@ -212,8 +190,7 @@ model Session {
   scope         String?
   expires       DateTime?
   accessToken   String
-
-  userId        BigInt?   @db.BigInt
+  userId        BigInt?
   firstName     String?
   lastName      String?
   email         String?

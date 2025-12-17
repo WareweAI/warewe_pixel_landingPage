@@ -39,6 +39,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
       },
     });
 
+    // Real-time active visitors (last 5 minutes)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const activeNow = await prisma.analyticsSession.count({
+      where: { 
+        appId: app.id,
+        lastSeen: { gte: fiveMinutesAgo },
+      },
+    });
+
     // Get stats
     const totalSessions = await prisma.analyticsSession.count({
       where: { appId: app.id },
@@ -89,6 +98,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }).then(results => results.map(r => ({ type: r.deviceType!, count: r._count })));
 
     return Response.json({
+      activeNow,
       totalSessions,
       uniqueVisitors,
       avgDuration,

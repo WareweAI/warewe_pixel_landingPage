@@ -1,37 +1,47 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import { authenticate } from "../shopify.server";
-import prisma from "../db.server";
 import {
   Page,
   Layout,
   Card,
-  Text,
   DataTable,
-  EmptyState,
-  Select,
+  Text,
   InlineStack,
-  BlockStack,
-  InlineGrid,
+  Badge,
 } from "@shopify/polaris";
+import { getShopifyInstance } from "../shopify.server";
+import prisma from "../db.server";
+
+type VisitorEvent = {
+  id: string;
+  appId: string;
+  eventName: string;
+  url: string | null;
+  referrer: string | null;
+  country: string | null;
+  countryCode: string | null;
+  city: string | null;
+  deviceType: string | null;
+  browser: string | null;
+  os: string | null;
+  createdAt: string;
+};
+
+type AppLite = { id: string; appId: string; name: string };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  const shopify = getShopifyInstance();
+  if (!shopify?.authenticate) {
+    throw new Response("Shopify configuration not found", { status: 500 });
+  }
+
+  const { session } = await shopify.authenticate.admin(request);
   const shop = session.shop;
 
-  let user = await prisma.user.findUnique({
-    where: { email: shop },
-  });
-
+  const user = await prisma.user.findUnique({ where: { email: shop } });
   if (!user) {
-    const { generateRandomPassword } = await import("~/lib/crypto.server");
-    user = await prisma.user.create({
-      data: {
-        email: shop,
-        password: generateRandomPassword(),
-      },
-    });
+    return { events: [], apps: [] };
   }
 
   const apps = await prisma.app.findMany({
@@ -39,138 +49,121 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     select: { id: true, appId: true, name: true },
   });
 
-  return { apps };
+  if (!apps.length) {
+    return { events: [], apps };
+  }
+
+  const events = await prisma.event.findMany({
+    where: { appId: { in: apps.map((a) => a.id) } },
+    orderBy: { createdAt: "desc" },
+    take: 200,
+    select: {
+      id: true,
+      appId: true,
+      eventName: true,
+      url: true,
+      referrer: true,
+      country: true,
+      countryCode: true,
+      city: true,
+      deviceType: true,
+      browser: true,
+      os: true,
+      createdAt: true,
+    },
+  });
+
+  return {
+    events: events.map((e) => ({ ...e, createdAt: e.createdAt.toISOString() })),
+    apps,
+  };
 };
 
 export default function VisitorsPage() {
-  const { apps } = useLoaderData<typeof loader>();
-  const [selectedApp, setSelectedApp] = useState(apps[0]?.appId || "");
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const { events, apps } = useLoaderData<typeof loader>() as {
+    events: VisitorEvent[];
+    apps: AppLite[];
+  };
 
-  useEffect(() => {
-    if (!selectedApp) return;
-
-    setLoading(true);
-    fetch(`/api/visitors?appId=${selectedApp}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data.error) {
-          setData(data);
-        }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [selectedApp]);
-
-  const rows =
-    data?.sessions?.map((session: any) => [
-      session.sessionId.slice(0, 12) + "...",
-      session.country || "-",
-      session.browser || "-",
-      session.deviceType || "-",
-      session.pageviews,
-      new Date(session.startTime).toLocaleString(),
-    ]) || [];
+  const appName = useMemo(
+    () => (id: string) => apps.find((a) => a.id === id)?.name || "Unknown",
+    [apps]
+  );
 
   return (
-    <Page title="Visitors">
+    <Page title="Visitors" subtitle="Recent visits with geo and device info">
       <Layout>
         <Layout.Section>
           <Card>
-            <BlockStack gap="400">
-              <InlineStack align="space-between">
-                <Text variant="headingMd" as="h2">
-                  Visitor Sessions
-                </Text>
-                {apps.length > 0 && (
-                  <div style={{ width: "200px" }}>
-                    <Select
-                      label=""
-                      options={apps.map((app) => ({
-                        label: app.name,
-                        value: app.appId,
-                      }))}
-                      value={selectedApp}
-                      onChange={setSelectedApp}
-                    />
-                  </div>
-                )}
-              </InlineStack>
-
-              {data && (
-                <InlineGrid columns={4} gap="400">
-                  <Card>
-                    <BlockStack gap="200">
-                      <Text variant="bodySm" as="p" tone="subdued">
-                        Total Sessions
-                      </Text>
-                      <Text variant="headingLg" as="p">
-                        {data.totalSessions?.toLocaleString() || 0}
-                      </Text>
-                    </BlockStack>
-                  </Card>
-                  <Card>
-                    <BlockStack gap="200">
-                      <Text variant="bodySm" as="p" tone="subdued">
-                        Unique Visitors
-                      </Text>
-                      <Text variant="headingLg" as="p">
-                        {data.uniqueVisitors?.toLocaleString() || 0}
-                      </Text>
-                    </BlockStack>
-                  </Card>
-                  <Card>
-                    <BlockStack gap="200">
-                      <Text variant="bodySm" as="p" tone="subdued">
-                        Avg. Duration
-                      </Text>
-                      <Text variant="headingLg" as="p">
-                        {data.avgDuration
-                          ? `${Math.floor(data.avgDuration / 60)}m`
-                          : "0m"}
-                      </Text>
-                    </BlockStack>
-                  </Card>
-                  <Card>
-                    <BlockStack gap="200">
-                      <Text variant="bodySm" as="p" tone="subdued">
-                        Bounce Rate
-                      </Text>
-                      <Text variant="headingLg" as="p">
-                        {data.bounceRate?.toFixed(1) || 0}%
-                      </Text>
-                    </BlockStack>
-                  </Card>
-                </InlineGrid>
-              )}
-
-              {apps.length === 0 ? (
-                <EmptyState
-                  heading="No pixels yet"
-                  action={{ content: "Create Pixel", url: "/app" }}
-                  image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-                >
-                  <p>Create a pixel to start tracking visitors.</p>
-                </EmptyState>
-              ) : rows.length === 0 && !loading ? (
-                <EmptyState
-                  heading="No sessions yet"
-                  image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
-                >
-                  <p>Visitor sessions will appear here once tracking starts.</p>
-                </EmptyState>
-              ) : (
-                <DataTable
-                  columnContentTypes={["text", "text", "text", "text", "numeric", "text"]}
-                  headings={["Session ID", "Country", "Browser", "Device", "Pageviews", "Started"]}
-                  rows={rows}
-                />
-              )}
-            </BlockStack>
+            {!events.length ? (
+              <Text as="p" tone="subdued">
+                No events yet. Install the pixel and check back after some traffic.
+              </Text>
+            ) : (
+              <DataTable
+                columnContentTypes={[
+                  "text",
+                  "text",
+                  "text",
+                  "text",
+                  "text",
+                  "text",
+                ]}
+                headings={[
+                  "App",
+                  "Event",
+                  "Page",
+                  "Location",
+                  "Device",
+                  "Time",
+                ]}
+                rows={events.map((e) => [
+                  appName(e.appId),
+                  e.eventName,
+                  e.url ? safePath(e.url) : "-",
+                  formatLocation(e.country, e.countryCode, e.city),
+                  formatDevice(e.deviceType, e.browser, e.os),
+                  new Date(e.createdAt).toLocaleString(),
+                ])}
+              />
+            )}
           </Card>
+        </Layout.Section>
+        <Layout.Section>
+          <InlineStack gap="300">
+            <Badge>
+              Showing {events.length} of {events.length >= 200 ? "200+" : "recent"} events
+            </Badge>
+          </InlineStack>
         </Layout.Section>
       </Layout>
     </Page>
   );
+}
+
+function safePath(url: string) {
+  try {
+    return new URL(url).pathname || "/";
+  } catch {
+    return url;
+  }
+}
+
+function formatLocation(
+  country: string | null,
+  countryCode: string | null,
+  city: string | null
+) {
+  if (city && (country || countryCode)) return `${city}, ${country || countryCode}`;
+  if (country || countryCode) return country || countryCode || "-";
+  return "-";
+}
+
+function formatDevice(
+  deviceType: string | null,
+  browser: string | null,
+  os: string | null
+) {
+  const parts = [deviceType, browser, os].filter(Boolean);
+  return parts.join(" • ") || "-";
 }

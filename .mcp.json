@@ -8,6 +8,12 @@
         "POLARIS_UNIFIED": "true",
         "LIQUID": "true"
       }
+    },
+    "postman": {
+      "url": "https://mcp.postman.com/minimal",
+      "headers": {
+        "Authorization": "Bearer ${POSTMAN_API_KEY}"
+      }
     }
   }
 }

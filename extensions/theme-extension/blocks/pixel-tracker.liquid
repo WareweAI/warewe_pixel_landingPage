@@ -1,0 +1,80 @@
+{% comment %}
+  Pixel Tracker - Theme App Extension
+  Uses Shopify App Proxy to avoid CORS issues
+  Requests go to: /apps/pixel-api/* (same origin as shop)
+{% endcomment %}
+
+{% if block.settings.enabled %}
+<!-- Pixel Tracker by Warewe -->
+<script>
+(function() {
+  var SHOP = '{{ shop.permanent_domain }}';
+  var DEBUG = {{ block.settings.debug_mode | default: false }};
+  
+  // Use App Proxy URL (same-origin, no CORS!)
+  var PROXY_URL = '/apps/pixel-api';
+  
+  // Fetch pixel config from app proxy
+  fetch(PROXY_URL + '/get-pixel-id?shop=' + encodeURIComponent(SHOP))
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.error) {
+        if (DEBUG) console.warn('[PixelTracker]', data.error);
+        return;
+      }
+      
+      window.PIXEL_TRACKER_ID = data.pixelId;
+      window.PIXEL_TRACKER_CONFIG = data.config || {};
+      
+      if (DEBUG) console.log('[PixelTracker] Config loaded:', data);
+      
+      // Load the pixel script via app proxy (no CORS!)
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = PROXY_URL + '/pixel.js?id=' + data.pixelId + '&shop=' + SHOP;
+      document.head.appendChild(script);
+      
+      // Load Facebook Pixel if configured
+      if (data.metaPixelId && data.enabled) {
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', data.metaPixelId);
+        fbq('track', 'PageView');
+        if (DEBUG) console.log('[PixelTracker] FB Pixel:', data.metaPixelId);
+      }
+    })
+    .catch(function(err) {
+      if (DEBUG) console.error('[PixelTracker] Error:', err);
+    });
+})();
+</script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Pixel Tracker",
+  "target": "head",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Enable Pixel Tracker",
+      "default": true,
+      "info": "Enable tracking on your store"
+    },
+    {
+      "type": "checkbox",
+      "id": "debug_mode",
+      "label": "Debug Mode",
+      "default": false,
+      "info": "Show debug info in browser console"
+    }
+  ]
+}
+{% endschema %}

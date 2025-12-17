@@ -1,75 +1,56 @@
-// Custom Events API endpoint
 import type { LoaderFunctionArgs } from "react-router";
-import prisma from "~/db.server";
+import db from "~/db.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const appId = url.searchParams.get("appId");
+  const shop = url.searchParams.get("shop");
 
-  // CORS headers for external access
-  const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
+  console.log("[Custom Events API] Request:", { appId, shop });
 
   if (!appId) {
-    return Response.json({ error: "App ID required" }, { status: 400, headers: corsHeaders });
+    return Response.json({ success: false, error: "App ID required" }, { status: 400 });
   }
 
   try {
-    // Find app by public appId
-    const app = await prisma.app.findUnique({
-      where: { appId },
-      select: { id: true },
+    // Find the app by appId (not id)
+    const app = await db.app.findFirst({
+      where: { appId: appId },
+      include: { customEvents: true }
     });
 
     if (!app) {
-      return Response.json({ error: "App not found" }, { status: 404, headers: corsHeaders });
+      console.log("[Custom Events API] App not found:", appId);
+      return Response.json({ success: false, error: "App not found" }, { status: 404 });
     }
 
-    // Get custom events for the app
-    const events = await prisma.customEvent.findMany({
-      where: { appId: app.id },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        displayName: true,
-        description: true,
-        selector: true,
-        eventType: true,
-        metaEventName: true,
-        hasProductId: true,
-        isActive: true,
-        createdAt: true,
-      },
+    console.log("[Custom Events API] Found app with", app.customEvents.length, "custom events");
+
+    // Return active custom events
+    const activeEvents = app.customEvents
+      .filter(event => event.isActive)
+      .map(event => ({
+        id: event.id,
+        name: event.name,
+        buttonText: event.buttonText,
+        buttonColor: event.buttonColor,
+        textColor: event.textColor,
+        data: event.eventData ? JSON.parse(event.eventData) : {}
+      }));
+
+    return Response.json({
+      success: true,
+      events: activeEvents,
+      appId: app.id
     });
 
-    return Response.json({ events }, { headers: corsHeaders });
   } catch (error) {
-    console.error("Custom events API error:", error);
-    return Response.json({ error: "Internal error" }, { status: 500, headers: corsHeaders });
+    console.error("[Custom Events API] Error:", error);
+    return Response.json({ success: false, error: "Database error" }, { status: 500 });
   }
 }
 
-// Handle OPTIONS preflight
-export async function action({ request }: LoaderFunctionArgs) {
-  if (request.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      },
-    });
-  }
-
-  return Response.json({ error: "Method not allowed" }, { status: 405 });
-}
-
-
-export default function CustomEventsAPI() {
+// Prevent empty chunk warning by providing a default export
+export default function ApiCustomEventsRoute() {
   return null;
 }

@@ -1,7 +1,7 @@
 // Meta Conversions API (CAPI) Service
 import * as crypto from "node:crypto";
 
-const META_GRAPH_API_VERSION = "v18.0";
+const META_GRAPH_API_VERSION = "v19.0";
 const META_GRAPH_API_URL = "https://graph.facebook.com";
 
 export interface MetaEventData {
@@ -75,7 +75,7 @@ export async function validateMetaCredentials(
     // If direct access fails, try the events endpoint
     if (data.error) {
       console.log("Direct access failed, trying events endpoint...", data.error);
-      
+
       // Method 2: Try the events endpoint - validates pixel ID and token work together
       const testResponse = await fetch(
         `${META_GRAPH_API_URL}/${META_GRAPH_API_VERSION}/${datasetId}/events?access_token=${accessToken}`,
@@ -102,7 +102,7 @@ export async function validateMetaCredentials(
       if (testData.error) {
         const errorCode = testData.error.code;
         let errorMessage = testData.error.message || "Invalid credentials";
-        
+
         if (errorCode === 100) {
           errorMessage = "Invalid Dataset ID (Pixel ID). Please check your Dataset ID from Meta Events Manager.";
         } else if (errorCode === 190) {
@@ -116,7 +116,7 @@ export async function validateMetaCredentials(
         } else if (errorCode === 2500) {
           errorMessage = "Invalid access token format. Please copy the full access token from Meta Events Manager.";
         }
-        
+
         return { valid: false, error: errorMessage, errorCode };
       }
 

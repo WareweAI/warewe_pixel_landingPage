@@ -1,19 +1,19 @@
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 import { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { Form, useActionData, useLoaderData, useRouteError, isRouteErrorResponse } from "react-router";
+import { Form, useActionData, useLoaderData, useRouteError, isRouteErrorResponse, redirect } from "react-router";
 
-import { login } from "../../shopify.server";
+import { login, reinitializeShopify, authenticate } from "../../shopify.server";
 import { loginErrorMessage } from "./error.server";
 import { loadEnv } from "../../lib/env-loader.server";
+import prisma from "../../db.server";
+import { generateRandomPassword } from "../../lib/crypto.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   // Load environment variables (server-only)
   loadEnv();
   if (!login) {
-    throw new Response("Shopify configuration not found. Please set SHOPIFY_API_KEY and SHOPIFY_API_SECRET environment variables.", {
-      status: 500,
-    });
+    return { errors: { shop: "Shopify configuration not found. Please set SHOPIFY_API_KEY and SHOPIFY_API_SECRET environment variables." } };
   }
 
   try {
@@ -44,20 +44,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // Load environment variables (server-only) - ensure fresh load
   loadEnv();
   
-  // Re-check login after loading env (in case it wasn't initialized before)
-  // Re-import to get fresh reference after env load
-  const { login: freshLogin } = await import("../../shopify.server");
+  // Reinitialize Shopify to get fresh instance after env vars are loaded
+  const freshInstance = reinitializeShopify(); // Clear cache and reinitialize with fresh env vars
   
-  if (!freshLogin && !login) {
-    console.error('❌ Shopify login not available after env load');
-    console.error('SHOPIFY_API_KEY:', process.env.SHOPIFY_API_KEY ? 'Present' : 'Missing');
-    console.error('SHOPIFY_API_SECRET:', process.env.SHOPIFY_API_SECRET ? 'Present' : 'Missing');
-    throw new Response("Shopify configuration not found. Please set SHOPIFY_API_KEY and SHOPIFY_API_SECRET environment variables.", {
-      status: 500,
-    });
-  }
-  
-  const activeLogin = freshLogin || login;
+  const activeLogin = freshInstance?.login || null;
 
   if (!activeLogin) {
     console.error('❌ Shopify login not available after env load');
@@ -85,7 +75,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
 
     // If login is successful (no errors), authenticate and redirect to app
-    const { authenticate } = await import("../../shopify.server");
     if (!authenticate) {
       return {
         errors: { shop: "Authentication not available. Please configure Shopify." },
@@ -97,7 +86,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       
       // Create or update user in database (only if database is available)
       try {
-        const prisma = (await import("../../db.server")).default;
         // Check if prisma is actually initialized (not empty object)
         if (prisma && typeof prisma.user !== "undefined") {
           let user = await prisma.user.findUnique({
@@ -105,7 +93,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
           });
 
           if (!user) {
-            const { generateRandomPassword } = await import("../../lib/crypto.server");
             user = await prisma.user.create({
               data: {
                 email: session.shop,
@@ -120,8 +107,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       }
 
       // Redirect to app dashboard
-      const { redirect } = await import("react-router");
-      throw redirect("/app");
+      throw redirect("/app/dashboard");
     } catch (authError) {
       // Re-throw redirect responses (they should propagate)
       if (authError instanceof Response) {
@@ -134,16 +120,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       };
     }
   } catch (error) {
+    // Handle redirect responses (302) as success, not errors
+    if (error instanceof Response && error.status >= 300 && error.status < 400) {
+      console.log("OAuth redirect (expected):", error.status, error.headers.get("Location"));
+      throw error; // Re-throw redirect responses
+    }
+
     console.error("Login action error:", error);
-    
-    // Re-throw redirect and error responses
+
+    // Re-throw other responses
     if (error instanceof Response) {
       throw error;
     }
-    
-    throw new Response("Failed to process login request. Please try again.", {
-      status: 500,
-    });
+
+    return { errors: { shop: "Failed to process login request. Please try again." } };
   }
 };
 
@@ -165,13 +155,10 @@ export default function Auth() {
         // Only works if same-origin, will fail silently if cross-origin
         if (inIframe && window.top) {
           try {
-            // Check if we can access window.top.location (same-origin check)
             const topLocation = window.top.location;
             // If we get here, we're same-origin, so redirect is safe
             topLocation.href = window.location.href;
           } catch (e) {
-            // Cross-origin iframe - can't break out, this is expected for Shopify embedded apps
-            // The Form has target="_top" which will handle the redirect properly
             setIsInIframe(false);
           }
         }
@@ -199,6 +186,7 @@ export default function Auth() {
         <Form method="post" target="_top">
           <s-section heading="Log in">
             <s-text-field
+              id="shop"
               name="shop"
               label="Shop domain"
               details="example.myshopify.com"
