@@ -46,17 +46,17 @@ export default function DocsPage() {
   const { baseUrl } = useLoaderData<typeof loader>();
 
   return (
-     <Page fullWidth>
-       <div style={{
-         minHeight: "100vh",
-         background: "linear-gradient(180deg, #0c0c14 0%, #111119 100%)",
-       }}>
+      <div style={{
+        minHeight: "100vh",
+        background: "linear-gradient(180deg, #0c0c14 0%, #111119 100%)",
+        margin: "-20px -20px 0 -20px",
+        padding: "20px",
+      }}>
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
           
           .docs-page {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #e4e4e7;
             max-width: 1100px;
             margin: 0 auto;
             padding: 60px 32px 80px;
@@ -1018,6 +1018,6 @@ export default function DocsPage() {
           </div>
         </div>
       </div>
-    </Page>
+    </div>
   );
 }
