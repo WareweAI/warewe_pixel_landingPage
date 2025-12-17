@@ -332,7 +332,7 @@ export default function DocsPage() {
               </Text>
               <div style={{ marginTop: "1.5rem", display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
                 <span className="feature-badge">
-                  <Icon source={CheckCircleIcon} /> Easy Installation
+                  <Icon source={CheckCircleIcon} /> Zero-Code Installation
                 </span>
                 <span className="feature-badge">
                   <Icon source={ChartLineIcon} /> Real-time Analytics
@@ -343,6 +343,9 @@ export default function DocsPage() {
                 <span className="feature-badge">
                   <Icon source={CartIcon} /> E-commerce Tracking
                 </span>
+                <span className="feature-badge">
+                  <Icon source={LockIcon} /> Anti-Adblocker
+                </span>
               </div>
             </div>
 
@@ -352,16 +355,15 @@ export default function DocsPage() {
                 <Icon source={ClipboardIcon} /> Table of Contents
               </h3>
               <ul>
-                <li><a href="#quick-start">🚀 Quick Start Guide</a></li>
-                <li><a href="#installation">📦 Installation</a></li>
+                <li><a href="#quick-start">🚀 Quick Start (3 Minutes)</a></li>
+                <li><a href="#how-it-works">⚙️ How It Works</a></li>
                 <li><a href="#dashboard">📊 Dashboard Overview</a></li>
                 <li><a href="#pixels">🎯 Facebook/Meta Pixels</a></li>
                 <li><a href="#auto-tracking">⚡ Automatic Tracking</a></li>
                 <li><a href="#custom-events">🛠️ Custom Events</a></li>
                 <li><a href="#ecommerce">🛒 E-commerce Tracking</a></li>
                 <li><a href="#javascript-api">💻 JavaScript API</a></li>
-                <li><a href="#theme-integration">🎨 Theme Integration</a></li>
-                <li><a href="#settings">⚙️ Settings & Configuration</a></li>
+                <li><a href="#settings">⚙️ Settings</a></li>
                 <li><a href="#troubleshooting">🔧 Troubleshooting</a></li>
                 <li><a href="#faq">❓ FAQ</a></li>
               </ul>
@@ -373,11 +375,11 @@ export default function DocsPage() {
                 <div className="section-icon">
                   <Icon source={PlayIcon} />
                 </div>
-                1. Quick Start Guide
+                1. Quick Start Guide (3 Minutes)
               </h2>
               
               <div className="success-box">
-                <strong>5-Minute Setup:</strong> Get Pixel Tracker running on your store in just 5 minutes!
+                <strong>Zero-Code Setup:</strong> No theme editing required! Just enable the App Embed and you're done.
               </div>
               
               <div className="docs-section">
@@ -392,130 +394,146 @@ export default function DocsPage() {
                 <h3><span className="step-number">2</span> Create Your First Pixel</h3>
                 <p>
                   Navigate to <strong>Facebook Pixels</strong> in the sidebar and click <strong>"Add Facebook Pixel"</strong>. 
-                  Enter your Facebook Pixel ID (found in Meta Events Manager) and optionally your Conversions API access token.
+                  Enter a name for your pixel. Optionally add your Facebook Pixel ID for Meta integration.
                 </p>
               </div>
 
               <div className="docs-section">
-                <h3><span className="step-number">3</span> Get Installation Code</h3>
+                <h3><span className="step-number">3</span> Enable the App Embed (Required)</h3>
                 <p>
-                  Click <strong>"Get Code"</strong> next to your pixel. Copy the generated JavaScript snippet.
+                  This is the most important step! Enable the tracking script on your store:
                 </p>
-                <div className="code-block">
-                  <span className="comment">{'<!-- Pixel Tracker Installation Code -->'}</span>{'\n'}
-                  <span className="keyword">{'<script'}</span> <span className="property">src</span>=<span className="string">"{baseUrl}/api/pixel.js?id=YOUR_PIXEL_ID"</span><span className="keyword">{'>'}</span><span className="keyword">{'</script>'}</span>
+                <ol>
+                  <li>Go to <strong>Online Store → Themes</strong> in your Shopify Admin</li>
+                  <li>Click <strong>Customize</strong> on your active theme</li>
+                  <li>Click the <strong>puzzle icon</strong> (App embeds) in the left sidebar</li>
+                  <li>Find <strong>"Pixel Tracker"</strong> and toggle it <strong>ON</strong></li>
+                  <li>Click <strong>Save</strong> in the top right</li>
+                </ol>
+                <div className="info-box">
+                  <strong>Why App Embed?</strong> This method uses Shopify's App Proxy to route all tracking 
+                  requests through your store's domain, making it immune to ad blockers and avoiding CORS errors.
                 </div>
               </div>
 
               <div className="docs-section">
-                <h3><span className="step-number">4</span> Add to Your Theme</h3>
+                <h3><span className="step-number">4</span> Verify Installation</h3>
                 <p>
-                  In Shopify Admin: <strong>Online Store → Themes → Actions → Edit code → theme.liquid</strong>
+                  Visit your store in a new browser tab. Open DevTools (F12) → Console. You should see:
                 </p>
+                <div className="code-block">
+                  <span className="comment">[PixelTracker] Starting for shop: your-store.myshopify.com</span>{'\n'}
+                  <span className="comment">[PixelTracker] Config response: 200</span>{'\n'}
+                  <span className="comment">[PixelTracker] Config data: {'{'}pixelId: '...', ...{'}'}</span>{'\n'}
+                  <span className="comment">[PixelTracker] Ready: pixel_xxxxx</span>{'\n'}
+                  <span className="comment">[PixelTracker] pageview {'{'}...{'}'}</span>{'\n'}
+                  <span className="comment">[PixelTracker] Track response: 200</span>
+                </div>
                 <p>
-                  Paste the code just before the closing <code className="inline-code">{'</head>'}</code> tag.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3><span className="step-number">5</span> Verify Installation</h3>
-                <p>
-                  Visit your store in a new browser tab. Check your Pixel Tracker dashboard - you should 
-                  see your first pageview event within seconds!
+                  Check your Pixel Tracker dashboard - you should see your first pageview event within seconds!
                 </p>
               </div>
             </section>
 
-            {/* Installation */}
-            <section id="installation">
+            {/* How It Works */}
+            <section id="how-it-works">
               <h2>
                 <div className="section-icon">
-                  <Icon source={AppsIcon} />
+                  <Icon source={SettingsIcon} />
                 </div>
-                2. Installation Methods
+                2. How It Works
               </h2>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CodeIcon} />
-                  </div>
-                  Method 1: Theme.liquid (Recommended)
-                </h3>
-                <p>
-                  This is the recommended method for Shopify stores. It ensures the tracking script 
-                  loads on every page.
-                </p>
-                <ol>
-                  <li>Go to <strong>Online Store → Themes</strong> in your Shopify Admin</li>
-                  <li>Click <strong>Actions → Edit code</strong></li>
-                  <li>Open <code className="inline-code">theme.liquid</code> in the Layout folder</li>
-                  <li>Paste the tracking code before <code className="inline-code">{'</head>'}</code></li>
-                  <li>Click <strong>Save</strong></li>
-                </ol>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={SettingsIcon} />
-                  </div>
-                  Method 2: Shopify Web Pixels (For Checkout Events)
-                </h3>
-                <p>
-                  Use the Theme Integration feature for checkout tracking on Shopify Plus stores.
-                </p>
-                <ol>
-                  <li>Navigate to <strong>Theme Integration</strong> in the Pixel Tracker app</li>
-                  <li>Click <strong>"Install Web Pixel"</strong></li>
-                  <li>This creates a Shopify Web Pixel that tracks checkout events</li>
-                </ol>
-                <div className="info-box">
-                  <strong>Note:</strong> Web Pixels have access to checkout and order events that 
-                  standard JavaScript tracking cannot access due to Shopify security restrictions.
-                </div>
-              </div>
 
               <div className="docs-section">
                 <h3>
                   <div className="section-icon">
                     <Icon source={GlobeIcon} />
                   </div>
-                  Method 3: Google Tag Manager
+                  Architecture Overview
                 </h3>
                 <p>
-                  If you use Google Tag Manager, add the script as a Custom HTML tag:
+                  Pixel Tracker uses a sophisticated server-side tracking architecture:
                 </p>
                 <ol>
-                  <li>Create a new <strong>Custom HTML</strong> tag in GTM</li>
-                  <li>Paste the Pixel Tracker script code</li>
-                  <li>Set trigger to <strong>All Pages</strong></li>
-                  <li>Publish your GTM container</li>
+                  <li><strong>Theme App Extension (App Embed):</strong> Injects a small script into your store's {'<head>'}</li>
+                  <li><strong>Shopify App Proxy:</strong> Routes requests through <code className="inline-code">/apps/pixel-api/*</code> on your store domain</li>
+                  <li><strong>Server-Side Processing:</strong> Events are processed on our servers with geo-location, device detection, and session tracking</li>
+                  <li><strong>Database Storage:</strong> All events are stored securely for analytics</li>
+                  <li><strong>Meta Conversions API:</strong> Events are forwarded to Facebook server-side (optional)</li>
                 </ol>
               </div>
 
               <div className="docs-section">
                 <h3>
                   <div className="section-icon">
-                    <Icon source={CodeIcon} />
+                    <Icon source={LockIcon} />
                   </div>
-                  Method 4: Custom/Non-Shopify Websites
+                  Anti-Adblocker Technology
                 </h3>
                 <p>
-                  For any website, simply add the tracking script to your HTML:
+                  Because all tracking requests go through your store's domain (via Shopify App Proxy), 
+                  ad blockers cannot distinguish tracking requests from normal store requests. This ensures:
                 </p>
-                <div className="code-block">
-                  <span className="keyword">{'<!DOCTYPE html>'}</span>{'\n'}
-                  <span className="keyword">{'<html>'}</span>{'\n'}
-                  <span className="keyword">{'<head>'}</span>{'\n'}
-                  {'  '}<span className="comment">{'<!-- Your other head content -->'}</span>{'\n'}
-                  {'  '}<span className="keyword">{'<script'}</span> <span className="property">src</span>=<span className="string">"{baseUrl}/api/pixel.js?id=YOUR_PIXEL_ID"</span><span className="keyword">{'></script>'}</span>{'\n'}
-                  <span className="keyword">{'</head>'}</span>{'\n'}
-                  <span className="keyword">{'<body>'}</span>{'\n'}
-                  {'  '}<span className="comment">{'<!-- Your page content -->'}</span>{'\n'}
-                  <span className="keyword">{'</body>'}</span>{'\n'}
-                  <span className="keyword">{'</html>'}</span>
-                </div>
+                <ul>
+                  <li>100% event capture regardless of ad blockers</li>
+                  <li>No CORS errors (same-origin requests)</li>
+                  <li>Better data accuracy than traditional pixel tracking</li>
+                </ul>
+              </div>
+
+              <div className="docs-section">
+                <h3>
+                  <div className="section-icon">
+                    <Icon source={DatabaseIcon} />
+                  </div>
+                  Data Collected
+                </h3>
+                <table className="event-table">
+                  <thead>
+                    <tr>
+                      <th>Data Type</th>
+                      <th>Description</th>
+                      <th>Configurable</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Page URL</strong></td>
+                      <td>Full URL of the visited page</td>
+                      <td>Always collected</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Referrer</strong></td>
+                      <td>Where the visitor came from</td>
+                      <td>Always collected</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Device Info</strong></td>
+                      <td>Browser, OS, screen size</td>
+                      <td>Always collected</td>
+                    </tr>
+                    <tr>
+                      <td><strong>IP Address</strong></td>
+                      <td>Visitor's IP (for geo-location)</td>
+                      <td>Can be disabled</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Location</strong></td>
+                      <td>City, region, country</td>
+                      <td>Can be disabled</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Session ID</strong></td>
+                      <td>Unique session identifier</td>
+                      <td>Can be disabled</td>
+                    </tr>
+                    <tr>
+                      <td><strong>UTM Parameters</strong></td>
+                      <td>Marketing campaign data</td>
+                      <td>Always collected</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </section>
 
@@ -529,7 +547,7 @@ export default function DocsPage() {
               </h2>
               
               <p>
-                The Pixel Tracker dashboard provides comprehensive analytics for your store. Here's what each section offers:
+                The Pixel Tracker dashboard provides comprehensive analytics for your store:
               </p>
 
               <div className="docs-section">
@@ -541,11 +559,10 @@ export default function DocsPage() {
                 </h3>
                 <ul>
                   <li><strong>Total Events:</strong> Count of all tracked events</li>
-                  <li><strong>Unique Visitors:</strong> Number of unique visitors (based on device fingerprint)</li>
+                  <li><strong>Unique Visitors:</strong> Number of unique visitors</li>
                   <li><strong>Page Views:</strong> Total page view count</li>
                   <li><strong>Sessions:</strong> Browsing session count</li>
-                  <li><strong>Conversion Rate:</strong> Purchase events / Total visitors</li>
-                  <li><strong>Revenue:</strong> Total tracked revenue from purchases</li>
+                  <li><strong>Active Now:</strong> Real-time visitor count (last 5 minutes)</li>
                 </ul>
               </div>
 
@@ -557,11 +574,12 @@ export default function DocsPage() {
                   Analytics Page
                 </h3>
                 <ul>
-                  <li><strong>Traffic Sources:</strong> Where your visitors come from (referrers, UTM campaigns)</li>
+                  <li><strong>Traffic Sources:</strong> Where your visitors come from</li>
                   <li><strong>Device Breakdown:</strong> Desktop vs Mobile vs Tablet</li>
                   <li><strong>Browser Statistics:</strong> Chrome, Safari, Firefox, etc.</li>
                   <li><strong>Geographic Data:</strong> Countries, regions, cities</li>
-                  <li><strong>Time-based Charts:</strong> Events over time, peak hours</li>
+                  <li><strong>Top Events:</strong> Most frequent event types</li>
+                  <li><strong>Top Pages:</strong> Most visited URLs</li>
                 </ul>
               </div>
 
@@ -574,9 +592,9 @@ export default function DocsPage() {
                 </h3>
                 <ul>
                   <li><strong>Visitor List:</strong> All tracked visitors with their activity</li>
-                  <li><strong>Session Details:</strong> Pages viewed, time on site, actions taken</li>
-                  <li><strong>Visitor Journey:</strong> Complete path through your store</li>
+                  <li><strong>Session Details:</strong> Pages viewed, time on site</li>
                   <li><strong>Device Info:</strong> Browser, OS, screen size</li>
+                  <li><strong>Location:</strong> Country and city</li>
                 </ul>
               </div>
 
@@ -589,24 +607,8 @@ export default function DocsPage() {
                 </h3>
                 <ul>
                   <li><strong>Event Stream:</strong> Real-time feed of all events</li>
-                  <li><strong>Event Filtering:</strong> Filter by event type, date, visitor</li>
+                  <li><strong>Event Filtering:</strong> Filter by event type, date</li>
                   <li><strong>Event Details:</strong> Full payload for each event</li>
-                  <li><strong>Export Options:</strong> Download event data as CSV</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={TargetIcon} />
-                  </div>
-                  Conversions Page
-                </h3>
-                <ul>
-                  <li><strong>Conversion Tracking:</strong> Monitor key conversion events</li>
-                  <li><strong>Funnel Analysis:</strong> Track user flow through conversion steps</li>
-                  <li><strong>Meta Pixel Events:</strong> See events sent to Facebook/Meta</li>
-                  <li><strong>Attribution:</strong> Source attribution for conversions</li>
                 </ul>
               </div>
             </section>
@@ -621,8 +623,8 @@ export default function DocsPage() {
               </h2>
 
               <p>
-                Pixel Tracker integrates with Facebook/Meta Pixel through the Conversions API for 
-                server-side tracking, providing more reliable data than browser-only tracking.
+                Pixel Tracker integrates with Facebook/Meta Pixel through both browser-side and 
+                server-side (Conversions API) tracking.
               </p>
 
               <div className="docs-section">
@@ -630,16 +632,16 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={SettingsIcon} />
                   </div>
-                  Setting Up Your Pixel
+                  Setting Up Meta Integration
                 </h3>
                 <ol>
                   <li>Go to <Link url="https://business.facebook.com/events_manager" external>Meta Events Manager</Link></li>
                   <li>Select or create a Pixel</li>
                   <li>Copy your <strong>Pixel ID</strong> (16-digit number)</li>
-                  <li>Go to <strong>Settings → Generate Access Token</strong> for the Conversions API</li>
-                  <li>Copy the access token</li>
-                  <li>In Pixel Tracker, go to <strong>Facebook Pixels → Add Facebook Pixel</strong></li>
-                  <li>Enter your Pixel ID and Access Token</li>
+                  <li>In Pixel Tracker, go to <strong>Settings</strong></li>
+                  <li>Select your pixel and enable <strong>Meta Pixel Integration</strong></li>
+                  <li>Enter your Pixel ID</li>
+                  <li>Optionally add your <strong>Conversions API Access Token</strong> for server-side tracking</li>
                 </ol>
               </div>
 
@@ -648,7 +650,7 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={ChartLineIcon} />
                   </div>
-                  Standard Events Tracked
+                  Events Sent to Meta
                 </h3>
                 <table className="event-table">
                   <thead>
@@ -667,7 +669,7 @@ export default function DocsPage() {
                     <tr>
                       <td><strong>ViewContent</strong></td>
                       <td>Product page view</td>
-                      <td>Product ID, name, category, price</td>
+                      <td>Product ID, name, price</td>
                     </tr>
                     <tr>
                       <td><strong>AddToCart</strong></td>
@@ -675,48 +677,17 @@ export default function DocsPage() {
                       <td>Product ID, quantity, value</td>
                     </tr>
                     <tr>
-                      <td><strong>InitiateCheckout</strong></td>
-                      <td>Checkout starts</td>
-                      <td>Cart contents, total value</td>
-                    </tr>
-                    <tr>
-                      <td><strong>AddPaymentInfo</strong></td>
-                      <td>Payment info added</td>
-                      <td>Cart value, contents</td>
-                    </tr>
-                    <tr>
                       <td><strong>Purchase</strong></td>
-                      <td>Order completed</td>
-                      <td>Order ID, value, currency, products</td>
+                      <td>Order completed (webhook)</td>
+                      <td>Order ID, value, products</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={LockIcon} />
-                  </div>
-                  Data Privacy & Hashing
-                </h3>
-                <p>
-                  All personal data is hashed using SHA-256 before being sent to Meta:
-                </p>
-                <ul>
-                  <li>Email addresses</li>
-                  <li>Phone numbers</li>
-                  <li>First and last names</li>
-                  <li>City, state, ZIP code</li>
-                </ul>
-                <p>
-                  This ensures compliance with privacy regulations while maintaining conversion tracking accuracy.
-                </p>
-              </div>
-
               <div className="warning-box">
-                <strong>Important:</strong> The Conversions API access token is a sensitive credential. 
-                Never share it publicly or commit it to public repositories.
+                <strong>Important:</strong> The Conversions API access token is sensitive. 
+                Never share it publicly.
               </div>
             </section>
 
@@ -730,7 +701,8 @@ export default function DocsPage() {
               </h2>
               
               <p>
-                Pixel Tracker automatically captures various user interactions without any additional code:
+                Pixel Tracker automatically captures various user interactions without any additional code.
+                Configure these in <strong>Settings</strong>:
               </p>
 
               <div className="docs-section">
@@ -738,26 +710,12 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={ViewIcon} />
                   </div>
-                  Page Views
+                  Page Views (Default: ON)
                 </h3>
                 <ul>
                   <li>Captured on every page load</li>
                   <li>Includes full URL, page title, and referrer</li>
-                  <li>Works with SPA (Single Page Applications) using history API</li>
-                </ul>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ChartLineIcon} />
-                  </div>
-                  Scroll Depth
-                </h3>
-                <ul>
-                  <li>Tracks how far users scroll on each page</li>
-                  <li>Recorded at 25%, 50%, 75%, and 100% thresholds</li>
-                  <li>Helps identify engaging content</li>
+                  <li>Tracks UTM parameters automatically</li>
                 </ul>
               </div>
 
@@ -766,27 +724,24 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={TargetIcon} />
                   </div>
-                  Click Tracking
+                  Click Tracking (Default: ON)
                 </h3>
                 <ul>
-                  <li>Captures click coordinates (X, Y position)</li>
-                  <li>Records clicked element information</li>
-                  <li>Tracks outbound link clicks</li>
+                  <li>Tracks clicks on links, buttons, and interactive elements</li>
+                  <li>Records element type, text content, and href</li>
                 </ul>
               </div>
 
               <div className="docs-section">
                 <h3>
                   <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
+                    <Icon source={ChartLineIcon} />
                   </div>
-                  Session & Visitor Data
+                  Scroll Depth (Default: OFF)
                 </h3>
                 <ul>
-                  <li><strong>Session ID:</strong> Unique identifier for each browsing session</li>
-                  <li><strong>Visitor ID:</strong> Persistent identifier across sessions</li>
-                  <li><strong>Device Fingerprint:</strong> Browser and device characteristics</li>
-                  <li><strong>Session Duration:</strong> Time spent on site</li>
+                  <li>Tracks how far users scroll on each page</li>
+                  <li>Recorded at 25%, 50%, 75%, and 100% thresholds</li>
                 </ul>
               </div>
 
@@ -795,15 +750,13 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={GlobeIcon} />
                   </div>
-                  UTM Parameters
+                  UTM Parameters (Always ON)
                 </h3>
                 <p>Automatically captures marketing campaign parameters:</p>
                 <ul>
                   <li><code className="inline-code">utm_source</code> - Traffic source</li>
                   <li><code className="inline-code">utm_medium</code> - Marketing medium</li>
                   <li><code className="inline-code">utm_campaign</code> - Campaign name</li>
-                  <li><code className="inline-code">utm_term</code> - Search terms</li>
-                  <li><code className="inline-code">utm_content</code> - Ad content variant</li>
                 </ul>
               </div>
             </section>
@@ -818,51 +771,15 @@ export default function DocsPage() {
               </h2>
               
               <p>
-                Track specific user interactions beyond automatic tracking using data attributes or the JavaScript API.
+                Track specific user interactions using the dashboard or JavaScript API.
               </p>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CodeIcon} />
-                  </div>
-                  Method 1: Data Attributes (No-Code)
-                </h3>
-                <p>
-                  Add data attributes to any HTML element to track clicks:
-                </p>
-                <div className="code-block">
-                  <span className="comment">{'<!-- Basic event tracking -->'}</span>{'\n'}
-                  <span className="keyword">{'<button'}</span>{'\n'}
-                  {'  '}<span className="property">data-pixel-event</span>=<span className="string">"button_click"</span>{'\n'}
-                  {'  '}<span className="property">data-pixel-category</span>=<span className="string">"engagement"</span>{'\n'}
-                  {'  '}<span className="property">data-pixel-label</span>=<span className="string">"signup_cta"</span>{'\n'}
-                  <span className="keyword">{'>'}</span>{'\n'}
-                  {'  Sign Up Now'}{'\n'}
-                  <span className="keyword">{'</button>'}</span>
-                </div>
-
-                <p>For e-commerce events:</p>
-                <div className="code-block">
-                  <span className="comment">{'<!-- Add to cart with product data -->'}</span>{'\n'}
-                  <span className="keyword">{'<button'}</span>{'\n'}
-                  {'  '}<span className="property">data-pixel-event</span>=<span className="string">"add_to_cart"</span>{'\n'}
-                  {'  '}<span className="property">data-pixel-product-id</span>=<span className="string">"SKU-12345"</span>{'\n'}
-                  {'  '}<span className="property">data-pixel-product-name</span>=<span className="string">"Blue T-Shirt"</span>{'\n'}
-                  {'  '}<span className="property">data-pixel-value</span>=<span className="string">"29.99"</span>{'\n'}
-                  {'  '}<span className="property">data-pixel-currency</span>=<span className="string">"USD"</span>{'\n'}
-                  <span className="keyword">{'>'}</span>{'\n'}
-                  {'  Add to Cart'}{'\n'}
-                  <span className="keyword">{'</button>'}</span>
-                </div>
-              </div>
 
               <div className="docs-section">
                 <h3>
                   <div className="section-icon">
                     <Icon source={SettingsIcon} />
                   </div>
-                  Method 2: CSS Selector Rules (Dashboard)
+                  Method 1: Dashboard (No-Code)
                 </h3>
                 <p>
                   Configure tracking rules without touching code:
@@ -870,12 +787,13 @@ export default function DocsPage() {
                 <ol>
                   <li>Go to <strong>Custom Events</strong> in the dashboard</li>
                   <li>Click <strong>"Add Custom Event"</strong></li>
-                  <li>Enter a CSS selector (e.g., <code className="inline-code">.add-to-cart-btn</code>)</li>
-                  <li>Choose the event name and category</li>
+                  <li>Enter a name (e.g., "newsletter_signup")</li>
+                  <li>Enter a CSS selector (e.g., <code className="inline-code">#newsletter-form</code>)</li>
+                  <li>Choose the trigger type (click, submit, change)</li>
                   <li>Save the rule</li>
                 </ol>
                 <div className="info-box">
-                  <strong>Pro Tip:</strong> Use browser DevTools to find the exact CSS selector for any element.
+                  <strong>Pro Tip:</strong> Use browser DevTools (right-click → Inspect) to find CSS selectors.
                 </div>
               </div>
 
@@ -884,54 +802,32 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={CodeIcon} />
                   </div>
-                  Available Data Attributes
+                  Method 2: Data Attributes
                 </h3>
-                <table className="event-table">
-                  <thead>
-                    <tr>
-                      <th>Attribute</th>
-                      <th>Description</th>
-                      <th>Example</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><code className="inline-code">data-pixel-event</code></td>
-                      <td>Event name (required)</td>
-                      <td>"add_to_cart"</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">data-pixel-category</code></td>
-                      <td>Event category</td>
-                      <td>"ecommerce"</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">data-pixel-label</code></td>
-                      <td>Event label</td>
-                      <td>"featured_product"</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">data-pixel-value</code></td>
-                      <td>Numeric value</td>
-                      <td>"99.99"</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">data-pixel-product-id</code></td>
-                      <td>Product identifier</td>
-                      <td>"SKU-123"</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">data-pixel-product-name</code></td>
-                      <td>Product name</td>
-                      <td>"Blue Widget"</td>
-                    </tr>
-                    <tr>
-                      <td><code className="inline-code">data-pixel-currency</code></td>
-                      <td>Currency code</td>
-                      <td>"USD"</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <p>
+                  Add data attributes to any HTML element:
+                </p>
+                <div className="code-block">
+                  <span className="comment">{'<!-- Track button clicks -->'}</span>{'\n'}
+                  <span className="keyword">{'<button'}</span> <span className="property">data-pixel-event</span>=<span className="string">"signup_click"</span><span className="keyword">{'>'}</span>{'\n'}
+                  {'  Sign Up'}{'\n'}
+                  <span className="keyword">{'</button>'}</span>
+                </div>
+              </div>
+
+              <div className="docs-section">
+                <h3>
+                  <div className="section-icon">
+                    <Icon source={CodeIcon} />
+                  </div>
+                  Method 3: JavaScript API
+                </h3>
+                <div className="code-block">
+                  <span className="comment">// Track custom event</span>{'\n'}
+                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'newsletter_signup'</span>, {'{\n'}
+                  {'  '}<span className="property">email</span>: <span className="string">'user@example.com'</span>{'\n'}
+                  {'}'});
+                </div>
               </div>
             </section>
 
@@ -945,7 +841,7 @@ export default function DocsPage() {
               </h2>
               
               <p>
-                Comprehensive e-commerce tracking for Shopify stores and custom implementations.
+                Pixel Tracker provides built-in e-commerce tracking methods:
               </p>
 
               <div className="docs-section">
@@ -953,17 +849,15 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={ViewIcon} />
                   </div>
-                  Product View
+                  Track Product View
                 </h3>
-                <p>Automatically tracked on Shopify product pages. For custom implementations:</p>
                 <div className="code-block">
-                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'ViewContent'</span>, {'{\n'}
-                  {'  '}<span className="property">content_ids</span>: [<span className="string">'SKU-12345'</span>],{'\n'}
-                  {'  '}<span className="property">content_name</span>: <span className="string">'Blue T-Shirt'</span>,{'\n'}
-                  {'  '}<span className="property">content_category</span>: <span className="string">'Apparel'</span>,{'\n'}
-                  {'  '}<span className="property">value</span>: <span className="number">29.99</span>,{'\n'}
-                  {'  '}<span className="property">currency</span>: <span className="string">'USD'</span>{'\n'}
-                  {'}'});
+                  <span className="function">PixelAnalytics</span>.<span className="function">trackViewContent</span>({'\n'}
+                  {'  '}<span className="string">'SKU-12345'</span>,      <span className="comment">// Product ID</span>{'\n'}
+                  {'  '}<span className="string">'Blue T-Shirt'</span>,   <span className="comment">// Product Name</span>{'\n'}
+                  {'  '}<span className="number">29.99</span>,            <span className="comment">// Price</span>{'\n'}
+                  {'  '}<span className="string">'Apparel'</span>         <span className="comment">// Category</span>{'\n'}
+                  {');'}
                 </div>
               </div>
 
@@ -972,34 +866,15 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={CartIcon} />
                   </div>
-  Add to Cart
+                  Track Add to Cart
                 </h3>
                 <div className="code-block">
-                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'AddToCart'</span>, {'{\n'}
-                  {'  '}<span className="property">content_ids</span>: [<span className="string">'SKU-12345'</span>],{'\n'}
-                  {'  '}<span className="property">content_name</span>: <span className="string">'Blue T-Shirt'</span>,{'\n'}
-                  {'  '}<span className="property">content_type</span>: <span className="string">'product'</span>,{'\n'}
-                  {'  '}<span className="property">value</span>: <span className="number">29.99</span>,{'\n'}
-                  {'  '}<span className="property">currency</span>: <span className="string">'USD'</span>,{'\n'}
-                  {'  '}<span className="property">quantity</span>: <span className="number">1</span>{'\n'}
-                  {'}'});
-                </div>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Initiate Checkout
-                </h3>
-                <div className="code-block">
-                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'InitiateCheckout'</span>, {'{\n'}
-                  {'  '}<span className="property">content_ids</span>: [<span className="string">'SKU-12345'</span>, <span className="string">'SKU-67890'</span>],{'\n'}
-                  {'  '}<span className="property">num_items</span>: <span className="number">2</span>,{'\n'}
-                  {'  '}<span className="property">value</span>: <span className="number">59.98</span>,{'\n'}
-                  {'  '}<span className="property">currency</span>: <span className="string">'USD'</span>{'\n'}
-                  {'}'});
+                  <span className="function">PixelAnalytics</span>.<span className="function">trackAddToCart</span>({'\n'}
+                  {'  '}<span className="string">'SKU-12345'</span>,      <span className="comment">// Product ID</span>{'\n'}
+                  {'  '}<span className="string">'Blue T-Shirt'</span>,   <span className="comment">// Product Name</span>{'\n'}
+                  {'  '}<span className="number">29.99</span>,            <span className="comment">// Price</span>{'\n'}
+                  {'  '}<span className="number">1</span>                 <span className="comment">// Quantity</span>{'\n'}
+                  {');'}
                 </div>
               </div>
 
@@ -1008,24 +883,20 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={CheckCircleIcon} />
                   </div>
-                  Purchase / Order Complete
+                  Track Purchase
                 </h3>
                 <div className="code-block">
-                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'Purchase'</span>, {'{\n'}
-                  {'  '}<span className="property">content_ids</span>: [<span className="string">'SKU-12345'</span>, <span className="string">'SKU-67890'</span>],{'\n'}
-                  {'  '}<span className="property">content_type</span>: <span className="string">'product'</span>,{'\n'}
-                  {'  '}<span className="property">value</span>: <span className="number">59.98</span>,{'\n'}
-                  {'  '}<span className="property">currency</span>: <span className="string">'USD'</span>,{'\n'}
-                  {'  '}<span className="property">order_id</span>: <span className="string">'ORDER-123456'</span>,{'\n'}
-                  {'  '}<span className="property">num_items</span>: <span className="number">2</span>{'\n'}
-                  {'}'});
+                  <span className="function">PixelAnalytics</span>.<span className="function">trackPurchase</span>({'\n'}
+                  {'  '}<span className="number">59.98</span>,            <span className="comment">// Total Value</span>{'\n'}
+                  {'  '}<span className="string">'USD'</span>,            <span className="comment">// Currency</span>{'\n'}
+                  {'  '}<span className="string">'ORDER-123'</span>,      <span className="comment">// Order ID</span>{'\n'}
+                  {'  '}[...]                 <span className="comment">// Products array</span>{'\n'}
+                  {');'}
                 </div>
-              </div>
-
-              <div className="info-box">
-                <strong>Shopify Integration:</strong> When using the Theme Integration feature, purchase 
-                events are automatically tracked using Shopify's Web Pixels, which have access to the 
-                checkout process.
+                <div className="info-box">
+                  <strong>Server-Side Purchase Tracking:</strong> Purchases are also tracked automatically 
+                  via Shopify webhooks, ensuring 100% capture even if the customer closes the browser.
+                </div>
               </div>
             </section>
 
@@ -1039,133 +910,47 @@ export default function DocsPage() {
               </h2>
               
               <p>
-                The <code className="inline-code">PixelAnalytics</code> object provides methods for custom tracking.
+                The <code className="inline-code">PixelAnalytics</code> object is available globally after the script loads.
               </p>
 
               <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={CodeIcon} />
-                  </div>
-                  PixelAnalytics.track(eventName, properties)
-                </h3>
-                <p>Track a custom event with optional properties.</p>
+                <h3>Methods</h3>
+                <table className="event-table">
+                  <thead>
+                    <tr>
+                      <th>Method</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><code className="inline-code">track(eventName, props)</code></td>
+                      <td>Track a custom event</td>
+                    </tr>
+                    <tr>
+                      <td><code className="inline-code">trackPurchase(value, currency, orderId, products)</code></td>
+                      <td>Track a purchase</td>
+                    </tr>
+                    <tr>
+                      <td><code className="inline-code">trackAddToCart(productId, name, value, qty)</code></td>
+                      <td>Track add to cart</td>
+                    </tr>
+                    <tr>
+                      <td><code className="inline-code">trackViewContent(productId, name, value, category)</code></td>
+                      <td>Track product view</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="docs-section">
+                <h3>Shorthand</h3>
+                <p>You can also use the shorthand <code className="inline-code">px()</code> function:</p>
                 <div className="code-block">
-                  <span className="comment">// Basic event</span>{'\n'}
-                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'button_click'</span>);{'\n\n'}
-                  <span className="comment">// Event with properties</span>{'\n'}
-                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'signup_complete'</span>, {'{\n'}
-                  {'  '}<span className="property">method</span>: <span className="string">'email'</span>,{'\n'}
-                  {'  '}<span className="property">plan</span>: <span className="string">'premium'</span>{'\n'}
-                  {'}'});
+                  <span className="comment">// These are equivalent:</span>{'\n'}
+                  <span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'my_event'</span>);{'\n'}
+                  <span className="function">px</span>(<span className="string">'my_event'</span>);
                 </div>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={PersonIcon} />
-                  </div>
-                  PixelAnalytics.identify(userData)
-                </h3>
-                <p>Associate user data with the current visitor (hashed before sending).</p>
-                <div className="code-block">
-                  <span className="function">PixelAnalytics</span>.<span className="function">identify</span>({'{\n'}
-                  {'  '}<span className="property">email</span>: <span className="string">'user@example.com'</span>,{'\n'}
-                  {'  '}<span className="property">phone</span>: <span className="string">'+1234567890'</span>,{'\n'}
-                  {'  '}<span className="property">firstName</span>: <span className="string">'John'</span>,{'\n'}
-                  {'  '}<span className="property">lastName</span>: <span className="string">'Doe'</span>,{'\n'}
-                  {'  '}<span className="property">city</span>: <span className="string">'New York'</span>,{'\n'}
-                  {'  '}<span className="property">state</span>: <span className="string">'NY'</span>,{'\n'}
-                  {'  '}<span className="property">zip</span>: <span className="string">'10001'</span>,{'\n'}
-                  {'  '}<span className="property">country</span>: <span className="string">'US'</span>{'\n'}
-                  {'}'});
-                </div>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ViewIcon} />
-                  </div>
-                  PixelAnalytics.pageview()
-                </h3>
-                <p>Manually trigger a pageview (useful for SPAs).</p>
-                <div className="code-block">
-                  <span className="comment">// After SPA navigation</span>{'\n'}
-                  <span className="function">PixelAnalytics</span>.<span className="function">pageview</span>();{'\n\n'}
-                  <span className="comment">// With custom URL</span>{'\n'}
-                  <span className="function">PixelAnalytics</span>.<span className="function">pageview</span>(<span className="string">'/custom-page'</span>);
-                </div>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={InfoIcon} />
-                  </div>
-                  Checking if Loaded
-                </h3>
-                <div className="code-block">
-                  <span className="comment">// Check if PixelAnalytics is available</span>{'\n'}
-                  <span className="keyword">if</span> (<span className="keyword">typeof</span> <span className="function">PixelAnalytics</span> !== <span className="string">'undefined'</span>) {'{\n'}
-                  {'  '}<span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'my_event'</span>);{'\n'}
-                  {'}'}{'\n\n'}
-                  <span className="comment">// Or wait for it to load</span>{'\n'}
-                  <span className="property">window</span>.<span className="function">addEventListener</span>(<span className="string">'PixelAnalyticsReady'</span>, <span className="keyword">function</span>() {'{\n'}
-                  {'  '}<span className="function">PixelAnalytics</span>.<span className="function">track</span>(<span className="string">'my_event'</span>);{'\n'}
-                  {'}'});
-                </div>
-              </div>
-            </section>
-
-            {/* Theme Integration */}
-            <section id="theme-integration">
-              <h2>
-                <div className="section-icon">
-                  <Icon source={AppsIcon} />
-                </div>
-                9. Theme Integration (Shopify Web Pixels)
-              </h2>
-              
-              <p>
-                Use Shopify's native Web Pixels for enhanced checkout tracking on Shopify Plus stores.
-              </p>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={SettingsIcon} />
-                  </div>
-                  Setting Up Web Pixel
-                </h3>
-                <ol>
-                  <li>Navigate to <strong>Theme Integration</strong> in the app</li>
-                  <li>Click <strong>"Install Web Pixel"</strong></li>
-                  <li>The pixel will be automatically configured</li>
-                  <li>Checkout events will now be tracked</li>
-                </ol>
-              </div>
-
-              <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={ChartLineIcon} />
-                  </div>
-                  Checkout Events Tracked
-                </h3>
-                <ul>
-                  <li><strong>checkout_started</strong> - Customer begins checkout</li>
-                  <li><strong>payment_info_submitted</strong> - Payment details entered</li>
-                  <li><strong>checkout_completed</strong> - Order successfully placed</li>
-                  <li><strong>checkout_address_info_submitted</strong> - Shipping address entered</li>
-                  <li><strong>checkout_contact_info_submitted</strong> - Contact info entered</li>
-                </ul>
-              </div>
-
-              <div className="info-box">
-                <strong>Why Web Pixels?</strong> Shopify restricts third-party JavaScript on checkout pages for security. 
-                Web Pixels run in a sandboxed environment with access to checkout events that regular scripts cannot access.
               </div>
             </section>
 
@@ -1175,48 +960,34 @@ export default function DocsPage() {
                 <div className="section-icon">
                   <Icon source={SettingsIcon} />
                 </div>
-                10. Settings & Configuration
+                9. Settings & Configuration
               </h2>
 
               <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={LockIcon} />
-                  </div>
-                  Privacy Settings
-                </h3>
+                <h3>Automatic Tracking Settings</h3>
                 <ul>
-                  <li><strong>IP Anonymization:</strong> Mask visitor IP addresses</li>
-                  <li><strong>Location Tracking:</strong> Enable/disable geographic data collection</li>
-                  <li><strong>Cookie Consent:</strong> Respect Do Not Track headers</li>
+                  <li><strong>Auto-track pageviews:</strong> Track page loads automatically</li>
+                  <li><strong>Auto-track clicks:</strong> Track link and button clicks</li>
+                  <li><strong>Auto-track scroll depth:</strong> Track scroll milestones</li>
                 </ul>
               </div>
 
               <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={DatabaseIcon} />
-                  </div>
-                  Data Settings
-                </h3>
+                <h3>Privacy Settings</h3>
                 <ul>
-                  <li><strong>Data Retention:</strong> How long to keep event data</li>
-                  <li><strong>Sampling Rate:</strong> Track percentage of traffic</li>
-                  <li><strong>Excluded IPs:</strong> Ignore traffic from specific IPs</li>
+                  <li><strong>Record IP addresses:</strong> Store visitor IPs for geo-location</li>
+                  <li><strong>Record location data:</strong> Store city/country information</li>
+                  <li><strong>Record session data:</strong> Track sessions across pages</li>
                 </ul>
               </div>
 
               <div className="docs-section">
-                <h3>
-                  <div className="section-icon">
-                    <Icon source={TargetIcon} />
-                  </div>
-                  Pixel Settings
-                </h3>
+                <h3>Meta Integration Settings</h3>
                 <ul>
-                  <li><strong>Test Mode:</strong> Send events to Meta's test environment</li>
-                  <li><strong>Event Deduplication:</strong> Prevent duplicate events</li>
-                  <li><strong>Event Mapping:</strong> Map custom events to standard Meta events</li>
+                  <li><strong>Enable Meta Pixel forwarding:</strong> Send events to Facebook</li>
+                  <li><strong>Meta Pixel ID:</strong> Your 16-digit pixel ID</li>
+                  <li><strong>Access Token:</strong> For Conversions API (optional)</li>
+                  <li><strong>Test Event Code:</strong> For testing in Events Manager</li>
                 </ul>
               </div>
             </section>
@@ -1227,7 +998,7 @@ export default function DocsPage() {
                 <div className="section-icon">
                   <Icon source={WrenchIcon} />
                 </div>
-                11. Troubleshooting
+                10. Troubleshooting
               </h2>
 
               <div className="docs-section">
@@ -1235,14 +1006,13 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={AlertTriangleIcon} />
                   </div>
-                  Events Not Showing in Dashboard
+                  No events showing in dashboard
                 </h3>
                 <ol>
-                  <li>Check browser DevTools Network tab for <code className="inline-code">pixel.js</code> loading</li>
-                  <li>Verify the pixel ID in your installation code is correct</li>
-                  <li>Ensure there are no JavaScript errors in the console</li>
-                  <li>Check if ad blockers are preventing the script from loading</li>
-                  <li>Verify the domain is allowed in your pixel settings</li>
+                  <li><strong>Check App Embed is enabled:</strong> Online Store → Themes → Customize → App embeds → Pixel Tracker ON</li>
+                  <li><strong>Check console for errors:</strong> Open DevTools (F12) → Console</li>
+                  <li><strong>Look for [PixelTracker] messages:</strong> You should see "Starting for shop..." and "Track response: 200"</li>
+                  <li><strong>Verify pixel exists:</strong> Go to Facebook Pixels in the app and ensure you have at least one pixel created</li>
                 </ol>
               </div>
 
@@ -1251,13 +1021,13 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={AlertTriangleIcon} />
                   </div>
-                  Meta Pixel Events Not Working
+                  "Config data: error" in console
                 </h3>
+                <p>This means the pixel configuration couldn't be loaded:</p>
                 <ol>
-                  <li>Verify your Pixel ID is correct (16 digits)</li>
-                  <li>Check that the Conversions API token is valid</li>
-                  <li>Use the <Link url="https://business.facebook.com/events_manager" external>Meta Events Manager</Link> Test Events feature</li>
-                  <li>Check the Pixel Tracker logs for API errors</li>
+                  <li>Ensure you have created at least one pixel in the app</li>
+                  <li>Check that your app is properly installed</li>
+                  <li>Try reinstalling the app if the issue persists</li>
                 </ol>
               </div>
 
@@ -1266,14 +1036,15 @@ export default function DocsPage() {
                   <div className="section-icon">
                     <Icon source={AlertTriangleIcon} />
                   </div>
-                  Custom Events Not Tracking
+                  CORB or CORS errors
                 </h3>
-                <ul>
-                  <li>Ensure <code className="inline-code">data-pixel-event</code> attribute is present</li>
-                  <li>Check that the element is clickable</li>
-                  <li>Verify the CSS selector matches the element (for dashboard-configured events)</li>
-                  <li>Check the browser console for PixelAnalytics errors</li>
-                </ul>
+                <p>If you see Cross-Origin errors:</p>
+                <ol>
+                  <li>Go to <strong>Settings</strong> in the app</li>
+                  <li>Click <strong>"Delete Old Script Tags"</strong></li>
+                  <li>This removes any legacy script tags that may conflict</li>
+                  <li>Ensure you're using the App Embed method (not manual script tags)</li>
+                </ol>
               </div>
 
               <div className="docs-section">
@@ -1283,12 +1054,13 @@ export default function DocsPage() {
                   </div>
                   Debug Mode
                 </h3>
-                <p>Enable debug mode to see detailed logging:</p>
-                <div className="code-block">
-                  <span className="comment">// In browser console</span>{'\n'}
-                  <span className="property">localStorage</span>.<span className="function">setItem</span>(<span className="string">'pixelDebug'</span>, <span className="string">'true'</span>);{'\n'}
-                  <span className="comment">// Refresh the page</span>
-                </div>
+                <p>The tracking script has debug mode enabled by default. Check your browser console for detailed logs:</p>
+                <ul>
+                  <li><code className="inline-code">[PixelTracker] Starting for shop:</code> - Script initialized</li>
+                  <li><code className="inline-code">[PixelTracker] Config response: 200</code> - Config loaded successfully</li>
+                  <li><code className="inline-code">[PixelTracker] pageview {'{...}'}</code> - Event being sent</li>
+                  <li><code className="inline-code">[PixelTracker] Track response: 200</code> - Event saved successfully</li>
+                </ul>
               </div>
             </section>
 
@@ -1298,54 +1070,52 @@ export default function DocsPage() {
                 <div className="section-icon">
                   <Icon source={QuestionCircleIcon} />
                 </div>
-                12. Frequently Asked Questions
+                11. Frequently Asked Questions
               </h2>
 
               <div className="docs-section">
-                <h3>How many pixels can I create?</h3>
+                <h3>Do I need to edit my theme code?</h3>
                 <p>
-                  You can create multiple Facebook Pixels per store. Each pixel operates independently 
-                  and can be enabled/disabled as needed.
+                  <strong>No!</strong> Just enable the App Embed in your theme editor. No code editing required.
                 </p>
               </div>
 
               <div className="docs-section">
-                <h3>Does this work with headless Shopify?</h3>
+                <h3>Will ad blockers affect tracking?</h3>
                 <p>
-                  Yes! You can use the JavaScript API on any frontend. Just include the tracking script 
-                  and use the <code className="inline-code">PixelAnalytics.track()</code> method.
+                  <strong>No.</strong> Because tracking goes through your store's domain via Shopify App Proxy, 
+                  ad blockers cannot distinguish it from normal store requests.
+                </p>
+              </div>
+
+              <div className="docs-section">
+                <h3>Is purchase tracking automatic?</h3>
+                <p>
+                  <strong>Yes.</strong> Purchases are tracked via Shopify webhooks (server-side), ensuring 
+                  100% capture even if the customer closes their browser after payment.
+                </p>
+              </div>
+
+              <div className="docs-section">
+                <h3>Can I track multiple stores?</h3>
+                <p>
+                  Each store installation is independent. Install the app on each store you want to track.
                 </p>
               </div>
 
               <div className="docs-section">
                 <h3>Is the data GDPR compliant?</h3>
                 <p>
-                  Yes. Pixel Tracker supports IP anonymization, respects Do Not Track headers, and 
-                  provides data deletion capabilities. All personal data sent to Meta is hashed using SHA-256.
+                  Yes. You can disable IP recording and location tracking in Settings. 
+                  All data sent to Meta is hashed using SHA-256.
                 </p>
               </div>
 
               <div className="docs-section">
-                <h3>How does deduplication work?</h3>
+                <h3>Why is my store password protected?</h3>
                 <p>
-                  Each event is assigned a unique event ID. When using both browser and server-side 
-                  tracking, Meta uses this ID to deduplicate events automatically.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3>Can I track events on external domains?</h3>
-                <p>
-                  Yes, you can install the tracking script on any domain. Just add the allowed domains 
-                  in your pixel settings.
-                </p>
-              </div>
-
-              <div className="docs-section">
-                <h3>What happens if the tracking script fails to load?</h3>
-                <p>
-                  The tracking script is designed to fail silently without affecting your website's 
-                  functionality. Users will still have a normal browsing experience.
+                  Shopify requires a paid plan to remove password protection. You can still test 
+                  tracking by entering the password and checking the console for [PixelTracker] messages.
                 </p>
               </div>
             </section>
@@ -1383,7 +1153,7 @@ export default function DocsPage() {
                 <Icon source={BookOpenIcon} />
               </div>
               <p style={{ fontSize: "1rem", fontWeight: "500" }}>
-                Documentation last updated: January 2025
+                Documentation last updated: December 2024
               </p>
               <p style={{ fontSize: "0.875rem", marginTop: "0.5rem" }}>
                 <Link url="/privacy-policy">Privacy Policy</Link>
