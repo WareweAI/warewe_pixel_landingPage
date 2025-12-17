@@ -45,20 +45,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function DocsPage() {
   const { baseUrl } = useLoaderData<typeof loader>();
 
-  return (
-    <div style={{
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)",
-      margin: "-16px",
-      padding: "0",
-      width: "calc(100% + 32px)",
-    }}>
+    return (
+     <Page fullWidth>
+       <div style={{
+         minHeight: "100vh",
+         background: "#ffffff",
+       }}>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
           
           .docs-page {
-            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #e2e8f0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #1e293b;
             max-width: 1100px;
             margin: 0 auto;
             padding: 60px 32px 80px;
@@ -73,40 +71,37 @@ export default function DocsPage() {
           .hero::before {
             content: '';
             position: absolute;
-            top: 0;
+            top: -100px;
             left: 50%;
             transform: translateX(-50%);
-            width: 600px;
+            width: 800px;
             height: 600px;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
             pointer-events: none;
           }
           .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            padding: 8px 16px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 10px 20px;
             border-radius: 50px;
             font-size: 0.875rem;
-            color: #a5b4fc;
-            margin-bottom: 24px;
+            color: #fff;
+            margin-bottom: 28px;
+            font-weight: 500;
           }
           .hero h1 {
-            font-size: 4.5rem;
-            font-weight: 700;
-            margin: 0 0 20px;
-            background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #6366f1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: 0.02em;
-            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 0 0 24px;
+            color: #0f172a;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
           }
           .hero-subtitle {
             font-size: 1.25rem;
-            color: #94a3b8;
+            color: #64748b;
             max-width: 600px;
             margin: 0 auto 40px;
             line-height: 1.7;
@@ -122,18 +117,21 @@ export default function DocsPage() {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 10px 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px 20px;
             border-radius: 50px;
             font-size: 0.9rem;
-            color: #e2e8f0;
+            color: #475569;
+            font-weight: 500;
             transition: all 0.3s ease;
           }
           .feature-pill:hover {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.3);
+            background: #f1f5f9;
+            border-color: #6366f1;
+            color: #6366f1;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
           }
           .feature-pill svg {
             width: 18px;
@@ -143,17 +141,16 @@ export default function DocsPage() {
           
           /* Table of Contents */
           .toc {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 20px;
             padding: 32px;
             margin: 48px 0 64px;
-            backdrop-filter: blur(10px);
           }
           .toc h3 {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #a5b4fc;
+            color: #6366f1;
             margin: 0 0 20px;
             display: flex;
             align-items: center;
@@ -170,15 +167,17 @@ export default function DocsPage() {
             gap: 10px;
             padding: 12px 16px;
             border-radius: 10px;
-            color: #cbd5e1;
+            color: #475569;
             text-decoration: none;
             font-size: 0.95rem;
+            font-weight: 500;
             transition: all 0.2s ease;
           }
           .toc-link:hover {
-            background: rgba(99, 102, 241, 0.1);
-            color: #fff;
+            background: #fff;
+            color: #6366f1;
             transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
           }
           .toc-link span {
             font-size: 1.1rem;
@@ -204,7 +203,7 @@ export default function DocsPage() {
             align-items: center;
             justify-content: center;
             color: white;
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
           }
           .section-icon svg {
             width: 24px;
@@ -213,43 +212,42 @@ export default function DocsPage() {
           .section h2 {
             font-size: 2rem;
             font-weight: 700;
-            color: #fff;
+            color: #0f172a;
             margin: 0;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
           }
           .section-intro {
             font-size: 1.1rem;
-            color: #94a3b8;
+            color: #64748b;
             line-height: 1.8;
             margin-bottom: 32px;
           }
           
           /* Cards */
           .card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #fff;
+            border: 1px solid #e2e8f0;
             border-radius: 16px;
             padding: 28px;
             margin: 20px 0;
             transition: all 0.3s ease;
           }
           .card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(99, 102, 241, 0.2);
+            border-color: #c7d2fe;
             transform: translateY(-2px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.1);
           }
           .card h3 {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #fff;
+            color: #0f172a;
             margin: 0 0 16px;
             display: flex;
             align-items: center;
             gap: 12px;
           }
           .card p {
-            color: #94a3b8;
+            color: #64748b;
             line-height: 1.8;
             margin: 0 0 16px;
           }
@@ -258,7 +256,7 @@ export default function DocsPage() {
             padding-left: 24px;
           }
           .card li {
-            color: #cbd5e1;
+            color: #475569;
             margin: 10px 0;
             line-height: 1.7;
           }
@@ -266,14 +264,14 @@ export default function DocsPage() {
             color: #6366f1;
           }
           .card strong {
-            color: #fff;
+            color: #0f172a;
             font-weight: 600;
           }
           
           /* Step Cards */
           .step-card {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.15);
+            background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+            border: 1px solid #e9d5ff;
             border-radius: 16px;
             padding: 28px;
             margin: 16px 0;
@@ -307,19 +305,18 @@ export default function DocsPage() {
             align-items: center;
             font-size: 1.15rem;
             font-weight: 600;
-            color: #fff;
+            color: #0f172a;
             margin: 0 0 12px;
           }
           .step-card p {
-            color: #94a3b8;
+            color: #64748b;
             line-height: 1.8;
             margin: 0;
           }
           
           /* Code Blocks */
           .code-block {
-            background: #0d1117;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #1e293b;
             border-radius: 12px;
             padding: 20px 24px;
             margin: 16px 0;
@@ -327,21 +324,23 @@ export default function DocsPage() {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.875rem;
             line-height: 1.7;
+            color: #e2e8f0;
           }
-          .code-block .comment { color: #6e7681; }
-          .code-block .keyword { color: #ff7b72; }
-          .code-block .string { color: #a5d6ff; }
-          .code-block .function { color: #d2a8ff; }
-          .code-block .property { color: #79c0ff; }
-          .code-block .number { color: #ffa657; }
+          .code-block .comment { color: #64748b; }
+          .code-block .keyword { color: #f472b6; }
+          .code-block .string { color: #86efac; }
+          .code-block .function { color: #c4b5fd; }
+          .code-block .property { color: #7dd3fc; }
+          .code-block .number { color: #fcd34d; }
           
           .inline-code {
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
+            background: #f1f5f9;
+            color: #6366f1;
             padding: 3px 8px;
             border-radius: 6px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85em;
+            font-weight: 500;
           }
           
           /* Alert Boxes */
@@ -359,30 +358,30 @@ export default function DocsPage() {
             margin-top: 2px;
           }
           .alert-success {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
           }
           .alert-success .alert-icon { color: #22c55e; }
           .alert-info {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid rgba(59, 130, 246, 0.2);
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
           }
           .alert-info .alert-icon { color: #3b82f6; }
           .alert-warning {
-            background: rgba(251, 191, 36, 0.1);
-            border: 1px solid rgba(251, 191, 36, 0.2);
+            background: #fffbeb;
+            border: 1px solid #fde68a;
           }
-          .alert-warning .alert-icon { color: #fbbf24; }
+          .alert-warning .alert-icon { color: #f59e0b; }
           .alert-content {
             flex: 1;
           }
           .alert-content strong {
-            color: #fff;
+            color: #0f172a;
             display: block;
             margin-bottom: 4px;
           }
           .alert-content p {
-            color: #94a3b8;
+            color: #64748b;
             margin: 0;
             line-height: 1.6;
           }
@@ -392,37 +391,37 @@ export default function DocsPage() {
             overflow-x: auto;
             margin: 20px 0;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid #e2e8f0;
           }
           .data-table {
             width: 100%;
             border-collapse: collapse;
           }
           .data-table th {
-            background: rgba(99, 102, 241, 0.1);
+            background: #f8fafc;
             padding: 14px 20px;
             text-align: left;
             font-weight: 600;
-            color: #a5b4fc;
-            font-size: 0.9rem;
+            color: #6366f1;
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
           }
           .data-table td {
             padding: 14px 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
-            color: #cbd5e1;
+            border-top: 1px solid #f1f5f9;
+            color: #475569;
           }
           .data-table tr:hover td {
-            background: rgba(255, 255, 255, 0.02);
+            background: #fafafa;
           }
           
           /* Footer */
           .footer {
             margin-top: 100px;
             padding: 48px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
             border-radius: 20px;
             text-align: center;
           }
@@ -440,29 +439,30 @@ export default function DocsPage() {
           .footer h3 {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #fff;
+            color: #0f172a;
             margin: 0 0 8px;
           }
           .footer p {
-            color: #94a3b8;
+            color: #64748b;
             margin: 8px 0;
           }
           .footer a {
-            color: #a5b4fc;
+            color: #6366f1;
             text-decoration: none;
+            font-weight: 500;
             transition: color 0.2s;
           }
           .footer a:hover {
-            color: #fff;
+            color: #4f46e5;
           }
           .footer-divider {
             height: 1px;
-            background: rgba(255, 255, 255, 0.06);
+            background: #e2e8f0;
             margin: 32px 0;
           }
           .footer-bottom {
             font-size: 0.875rem;
-            color: #64748b;
+            color: #94a3b8;
           }
           
           /* Responsive */
@@ -1010,6 +1010,6 @@ export default function DocsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </Page>
   );
 }
